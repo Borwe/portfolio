@@ -3,4 +3,10 @@
     <mat-icon id="main_menu_button">menu</mat-icon>
   </button>
   <span class="title">Welcome To My Portfolio</span>
+  <button mat-raised-button color="accent" class="title_options">Open Source Contributions</button>
+  <button mat-raised-button [matMenuTriggerFor]="menu" color="accent" class="title_options">Projects</button>
+  <mat-menu #menu="matMenu">
+    <button mat-menu-item>GitHub</button>
+    <button mat-menu-item>GitLab</button>
+  </mat-menu>
 </mat-toolbar>
