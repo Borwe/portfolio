@@ -15,7 +15,7 @@
 
 <mat-sidenav-container height=100%>
   <mat-sidenav #sidenav mode="over">
-    <button mat-raised-button color="accent" class="title_options">Open Source Contributions</button> <br>
+    <a mat-raised-button color="accent" class="title_options" routerLink="opensource">Open Source Contributions</a>
     <button mat-raised-button [matMenuTriggerFor]="menu" color="accent" class="title_options">Projects</button>
     <mat-menu #menu="matMenu">
       <button mat-menu-item>GitHub</button>
