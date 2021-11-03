@@ -10,6 +10,7 @@ import { MatSidenav } from '@angular/material/sidenav';
 export class AppComponent {
   @ViewChild('sidenav') sideNav!: MatSidenav;
   screenWide = true;
+  navBarOpenStatus = false;
 
   ngOinit(){
     this.onResize(null);
@@ -17,9 +18,9 @@ export class AppComponent {
 
   toggleSideNav(event: Event){
     if(this.sideNav.opened){
-      this.sideNav.close();
+      this.sideNav.close().finally(()=>this.navBarOpenStatus=false)
     }else if(this.screenWide==false && !this.sideNav.opened){
-      this.sideNav.open();
+      this.sideNav.open().finally(()=>this.navBarOpenStatus=true)
     }
   }
 
@@ -28,6 +29,8 @@ export class AppComponent {
     console.log("Size is @: ",window.innerWidth);
     if(window.innerWidth<=710){
       this.screenWide=false;
+      if(this.navBarOpenStatus==true)
+        this.sideNav.open().finally(()=>this.navBarOpenStatus=true)
     }else{
       this.screenWide=true;
       if(this.sideNav.opened)

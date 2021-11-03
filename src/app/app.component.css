@@ -10,3 +10,8 @@
 .main_tool_bar {
     box-shadow: 2px 2px 5px #000000;
 }
+
+.mat-sidenav-container{
+    height: 100%;
+    width: 100%;
+}
