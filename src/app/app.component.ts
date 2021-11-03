@@ -15,7 +15,9 @@ export class AppComponent {
   @HostListener('window:resize', ['$event'])
   onResize(event:any){
     console.log("Size is @: ",window.innerWidth);
-    if(window.innerWidth<=890)
+    if(window.innerWidth<=710)
       this.screenWide=false;
+    else
+      this.screenWide=true;
   }
 }

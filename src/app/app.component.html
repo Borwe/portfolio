@@ -1,12 +1,14 @@
 <mat-toolbar color="primary" class="main_tool_bar">
-  <button mat-icon-button   aria-label="Main Menu Icon">
+  <button mat-icon-button  aria-label="Main Menu Icon" *ngIf="!screenWide">
     <mat-icon id="main_menu_button">menu</mat-icon>
   </button>
   <span class="title">Welcome To My Portfolio</span>
-  <button mat-raised-button color="accent" class="title_options">Open Source Contributions</button>
-  <button mat-raised-button [matMenuTriggerFor]="menu" color="accent" class="title_options">Projects</button>
-  <mat-menu #menu="matMenu">
-    <button mat-menu-item>GitHub</button>
-    <button mat-menu-item>GitLab</button>
-  </mat-menu>
+  <div *ngIf="screenWide">
+    <button mat-raised-button color="accent" class="title_options">Open Source Contributions</button>
+    <button mat-raised-button [matMenuTriggerFor]="menu" color="accent" class="title_options">Projects</button>
+    <mat-menu #menu="matMenu">
+      <button mat-menu-item>GitHub</button>
+      <button mat-menu-item>GitLab</button>
+    </mat-menu>
+  </div>
 </mat-toolbar>
