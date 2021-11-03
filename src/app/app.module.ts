@@ -10,10 +10,17 @@ import { MatMenuModule } from "@angular/material/menu";
 import { MatSelectModule } from "@angular/material/select";
 import { MatButtonModule } from "@angular/material/button";
 import { MatSidenavModule } from "@angular/material/sidenav";
+import { RouterModule, Routes} from "@angular/router";
+
+import { OpenSourceComponent } from './open-source/open-source.component';
+
+const routes: Routes=[{path: 'opensource', component: OpenSourceComponent},
+  {path:"**", component:OpenSourceComponent}];
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    OpenSourceComponent
   ],
   imports: [
     BrowserModule,
@@ -23,8 +30,10 @@ import { MatSidenavModule } from "@angular/material/sidenav";
     MatMenuModule,
     MatButtonModule,
     MatSidenavModule,
-    BrowserAnimationsModule
+    BrowserAnimationsModule,
+    RouterModule.forRoot(routes)
   ],
+  exports: [RouterModule],
   providers: [],
   bootstrap: [AppComponent]
 })

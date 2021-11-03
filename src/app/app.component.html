@@ -4,7 +4,7 @@
   </button>
   <span class="title">Welcome To My Portfolio</span>
   <div *ngIf="screenWide">
-    <button mat-raised-button color="accent" class="title_options">Open Source Contributions</button>
+    <a mat-raised-button color="accent" class="title_options" routerLink="opensource">Open Source Contributions</a>
     <button mat-raised-button [matMenuTriggerFor]="menu" color="accent" class="title_options">Projects</button>
     <mat-menu #menu="matMenu">
       <button mat-menu-item>GitHub</button>
@@ -15,18 +15,16 @@
 
 <mat-sidenav-container height=100%>
   <mat-sidenav #sidenav mode="over">
-    <div *ngIf="screenWide">
-      <button mat-raised-button color="accent" class="title_options">Open Source Contributions</button> <br>
-      <button mat-raised-button [matMenuTriggerFor]="menu" color="accent" class="title_options">Projects</button>
-      <mat-menu #menu="matMenu">
-        <button mat-menu-item>GitHub</button>
-        <button mat-menu-item>GitLab</button>
-      </mat-menu>
-    </div>
+    <button mat-raised-button color="accent" class="title_options">Open Source Contributions</button> <br>
+    <button mat-raised-button [matMenuTriggerFor]="menu" color="accent" class="title_options">Projects</button>
+    <mat-menu #menu="matMenu">
+      <button mat-menu-item>GitHub</button>
+      <button mat-menu-item>GitLab</button>
+    </mat-menu>
   </mat-sidenav>
 
   <mat-sidenav-content>
-    HEHEHEHE, bitches
+    <router-outlet></router-outlet>
   </mat-sidenav-content>
 
 </mat-sidenav-container>

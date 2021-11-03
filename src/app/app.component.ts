@@ -1,6 +1,7 @@
 import { ViewChild } from '@angular/core';
 import { Component, HostListener } from '@angular/core';
 import { MatSidenav } from '@angular/material/sidenav';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-root',
@@ -11,6 +12,8 @@ export class AppComponent {
   @ViewChild('sidenav') sideNav!: MatSidenav;
   screenWide = true;
   navBarOpenStatus = false;
+
+  constructor(private router:Router){}
 
   ngOinit(){
     this.onResize(null);
