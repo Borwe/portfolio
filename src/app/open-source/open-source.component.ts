@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { count } from 'rxjs/operators';
+import { PullRequest } from 'src/models/PullRequests';
 import { GithubServiceService } from 'src/services/github-service.service';
 
 @Component({
@@ -8,13 +9,15 @@ import { GithubServiceService } from 'src/services/github-service.service';
   styleUrls: ['./open-source.component.css']
 })
 export class OpenSourceComponent implements OnInit {
+  //for holding pull requests
+  public prS: Array<PullRequest> = new Array<PullRequest>();
 
   constructor(private githubService: GithubServiceService) { }
 
   ngOnInit(): void {
-    this.githubService.getOpenSourcePRs().pipe(count()).subscribe((val=>{
-      console.log("PRs are: ",val)
-    }))
+    this.githubService.getOpenSourcePRs().subscribe((val=>{
+      this.prS.push(val)
+    }));
   }
 
 }

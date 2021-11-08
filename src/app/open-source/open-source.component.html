@@ -1,1 +1,10 @@
-<p>open-source works!</p>
+<h1>My contributions to opensource</h1>
+
+<mat-action-list>
+  <mat-card *ngFor="let pr of prS">
+  <mat-card-title >{{pr.title}}</mat-card-title>
+  <mat-card-subtitle>{{pr.created_at}}</mat-card-subtitle>
+  <mat-card-content>{{pr.body}}</mat-card-content>
+  <img mat-card-image src="{{pr.repo_pic}}">
+  </mat-card>
+</mat-action-list>

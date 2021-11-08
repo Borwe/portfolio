@@ -10,6 +10,8 @@ import { MatMenuModule } from "@angular/material/menu";
 import { MatSelectModule } from "@angular/material/select";
 import { MatButtonModule } from "@angular/material/button";
 import { MatSidenavModule } from "@angular/material/sidenav";
+import { MatCardModule } from "@angular/material/card";
+import { MatListModule } from "@angular/material/list";
 import { RouterModule, Routes} from "@angular/router";
 
 import { OpenSourceComponent } from './open-source/open-source.component';
@@ -28,6 +30,8 @@ const routes: Routes=[{path: 'opensource', component: OpenSourceComponent},
     HttpClientModule,
     AppRoutingModule,
     MatIconModule,
+    MatListModule,
+    MatCardModule,
     MatToolbarModule,
     MatMenuModule,
     MatButtonModule,

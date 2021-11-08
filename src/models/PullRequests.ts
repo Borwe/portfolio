@@ -6,12 +6,22 @@ export class PullRequest{
   title!: string;
   state!: string;
   body!: string;
+  created_at!: string;
+  repo_pic!: string;
 }
 
 export class PullRequestPage{
   total_count!: number;
   incomplete_results!: boolean;
   items!: Array<PullRequest>;
+}
+
+export class OwnerInfo{
+  avatar_url!: string;
+}
+
+export class RepoURL{
+  owner!: OwnerInfo;
 }
 
 export class NetworkError{

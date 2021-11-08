@@ -2,7 +2,7 @@ import { HttpClient, HttpHeaders, HttpRequest, HttpResponse } from '@angular/com
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map, mergeMap, filter, delay } from 'rxjs/operators';
-import { NetworkError, PullRequest, PullRequestPage } from 'src/models/PullRequests';
+import { NetworkError, PullRequest, PullRequestPage, RepoURL } from 'src/models/PullRequests';
 import { RateLimit, SearchLimit } from 'src/models/RateLimit';
 
 class CheckSearchLimit{
@@ -155,6 +155,24 @@ export class GithubServiceService {
 
       //we reach here if request was a success
       return this.getFullPRURls(response);
+    })).pipe(mergeMap(val=>{
+      let repu_url = val.repository_url;
+      return this.client.get(repu_url,{
+        observe: "response",
+        responseType: "json"
+      }).pipe(map(resp=>{
+        let response = resp;
+        while(response.status!=200){
+          //meaning request not successful, then repeat
+          this.client.get(response.url || "",{
+            observe: "response",
+            responseType: "json"
+          }).toPromise().then(val=>{response=val});
+        }
+        let avator_url:string = (response.body as RepoURL).owner.avatar_url;
+        val.repo_pic=avator_url;
+        return val
+      }))
     }))
   }  
 }
