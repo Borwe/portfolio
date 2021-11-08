@@ -124,7 +124,7 @@ export class GithubServiceService {
     }).pipe(mergeMap(val=>{
       let page_number:number = val as number;
       return this.checkSearchLimitAndWaitTillReady().pipe(mergeMap(v=>{
-        let prURL = this.prLink + page_number.toLocaleString()
+        let prURL = this.prLink + "&page=" + page_number.toLocaleString()
         return this.client.get(prURL,{
           observe: "response",
           responseType: "json"
@@ -144,13 +144,17 @@ export class GithubServiceService {
         responseType: "json"
       });
     })).pipe(mergeMap(val=>{
-      if(val.status!=200){
+      let response: HttpResponse<Object> = val;
+      while(response.status!=200){
         //meaning request not successful, then repeat
-        return this.getOpenSourcePRs();
+        this.client.get(response.url || "",{
+          observe: "response",
+          responseType: "json"
+        }).toPromise().then(val=>{response=val});
       }
 
       //we reach here if request was a success
-      return this.getFullPRURls(val);
+      return this.getFullPRURls(response);
     }))
   }  
 }

@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { count } from 'rxjs/operators';
 import { GithubServiceService } from 'src/services/github-service.service';
 
 @Component({
@@ -11,8 +12,8 @@ export class OpenSourceComponent implements OnInit {
   constructor(private githubService: GithubServiceService) { }
 
   ngOnInit(): void {
-    this.githubService.getOpenSourcePRs().subscribe((val=>{
-      console.log("PullRequest: ",val)
+    this.githubService.getOpenSourcePRs().pipe(count()).subscribe((val=>{
+      console.log("PRs are: ",val)
     }))
   }
 
