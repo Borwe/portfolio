@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { GithubServiceService } from 'src/services/github-service.service';
 
 @Component({
   selector: 'app-open-source',
@@ -7,9 +8,10 @@ import { Component, OnInit } from '@angular/core';
 })
 export class OpenSourceComponent implements OnInit {
 
-  constructor() { }
+  constructor(private githubService: GithubServiceService) { }
 
   ngOnInit(): void {
+    this.githubService.getOpenSourcePRs();
   }
 
 }

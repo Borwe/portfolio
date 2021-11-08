@@ -13,6 +13,7 @@ import { MatSidenavModule } from "@angular/material/sidenav";
 import { RouterModule, Routes} from "@angular/router";
 
 import { OpenSourceComponent } from './open-source/open-source.component';
+import { HttpClientModule } from '@angular/common/http';
 
 const routes: Routes=[{path: 'opensource', component: OpenSourceComponent},
   {path:"**", component:OpenSourceComponent}];
@@ -24,6 +25,7 @@ const routes: Routes=[{path: 'opensource', component: OpenSourceComponent},
   ],
   imports: [
     BrowserModule,
+    HttpClientModule,
     AppRoutingModule,
     MatIconModule,
     MatToolbarModule,
