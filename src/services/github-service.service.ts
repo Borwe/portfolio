@@ -1,8 +1,8 @@
-import { HttpClient, HttpRequest, HttpResponse } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpRequest, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map, mergeMap, filter, delay } from 'rxjs/operators';
-import { NetworkError } from 'src/models/PullRequests';
+import { NetworkError, PullRequest, PullRequestPage } from 'src/models/PullRequests';
 import { RateLimit, SearchLimit } from 'src/models/RateLimit';
 
 class CheckSearchLimit{
@@ -75,7 +75,82 @@ export class GithubServiceService {
     }))
   }
 
-  getOpenSourcePRs(){
-    this.checkSearchLimitAndWaitTillReady().subscribe();
+  private getPRFromResponse(response: HttpResponse<Object>): Observable<PullRequest> {
+
+    let val_return: Observable<PullRequest> = new Observable(sub=>{
+      
+      while(response.status != 200){
+        //keep making the request till it returns a 200
+        let url:string = response.url || "";
+        this.client.get(url,{
+          observe: "response",
+          responseType: "json"
+        }).toPromise().then(val=>{response=val});
+      }
+      sub.next(response.body)
+      sub.complete();
+    }).pipe(mergeMap(val=>{
+      //now transform it to a PullRequest from object
+      let arrayOfPRs: Array<PullRequest> = (val as PullRequestPage).items;
+      return new Observable<PullRequest>(sub=>{
+        arrayOfPRs.forEach(p=>{
+          sub.next(p)
+        })
+        sub.complete()
+      })
+    }));
+
+    return val_return;
   }
+
+  private getFullPRURls(pageOneInfo: HttpResponse<Object>): Observable<PullRequest>{
+    let headers: HttpHeaders = pageOneInfo.headers;
+    let links:string = headers.get("link") || "";
+
+    // check if link contains 'rel="last"'
+    // for the last page.
+    // from that we can start from pageOneInfo to the last page url
+    let responses: Observable<PullRequest> = new Observable(sub=>{
+      if(links.endsWith('rel="last"')){
+        //get the last page
+        let link: Array<string>= links.match("(?<=<)(.*?)(?=>)") || [];
+        let page_info: Array<string> = link[1].match("(?<=page=)(.*)") || [];
+        let last_page = parseInt(page_info[0]) || 1;
+        for(let x=1;x<=last_page;++x){
+          sub.next(x)
+        }
+      }
+      sub.complete();
+    }).pipe(mergeMap(val=>{
+      let page_number:number = val as number;
+      return this.checkSearchLimitAndWaitTillReady().pipe(mergeMap(v=>{
+        let prURL = this.prLink + page_number.toLocaleString()
+        return this.client.get(prURL,{
+          observe: "response",
+          responseType: "json"
+        });
+      }))
+    })).pipe(mergeMap(val=>{
+      return this.getPRFromResponse(val);
+    }));
+
+    return responses;
+  }
+
+  getOpenSourcePRs(url?:string): Observable<PullRequest>{
+    return this.checkSearchLimitAndWaitTillReady().pipe(mergeMap(val=>{
+      return this.client.get(this.prLink,{
+        observe: "response",
+        responseType: "json"
+      });
+    })).pipe(mergeMap(val=>{
+      if(val.status!=200){
+        //meaning request not successful, then repeat
+        return this.getOpenSourcePRs();
+      }
+
+      //we reach here if request was a success
+      return this.getFullPRURls(val);
+    }))
+  }  
 }

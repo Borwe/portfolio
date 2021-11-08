@@ -11,7 +11,9 @@ export class OpenSourceComponent implements OnInit {
   constructor(private githubService: GithubServiceService) { }
 
   ngOnInit(): void {
-    this.githubService.getOpenSourcePRs();
+    this.githubService.getOpenSourcePRs().subscribe((val=>{
+      console.log("PullRequest: ",val)
+    }))
   }
 
 }
