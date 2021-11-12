@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map, mergeMap, filter, delay } from 'rxjs/operators';
 import { NetworkError, PullRequest, PullRequestPage, RepoURL } from 'src/models/PullRequests';
-import { RateLimit, SearchLimit } from 'src/models/RateLimit';
+import { CoreLimit, RateLimit, SearchLimit } from 'src/models/RateLimit';
 
 class CheckSearchLimit{
   private count: number= 0;
@@ -63,12 +63,43 @@ export class GithubServiceService {
   checkSearchLimitAndWaitTillReady():Observable<SearchLimit> {
     let checkLimit: CheckSearchLimit = new CheckSearchLimit(this);
     return checkLimit.getSearchLimitObject().pipe(mergeMap(val=>{
-      let wait_period:number = (new Date().valueOf()/1000) -(val.reset || Number.MAX_VALUE);
+      let wait_period:Date = new Date(val.reset*1000);
       let obsv:Observable<SearchLimit> = new Observable(sub=>{
         sub.next(val);
         sub.complete()
       })
-      if(wait_period>0){
+      if(wait_period.getTime()>new Date().getTime()){
+        console.log("WAIT_TILL_SEARCH: ",wait_period)
+        obsv = obsv.pipe(delay(wait_period));
+      }
+      return obsv;
+    }))
+  }
+
+  checkCoreLimitAndWaitTillReday():Observable<CoreLimit>{
+    return this.getRateJson().pipe(map(val=>{
+      let response:HttpResponse<Object> = val 
+      while(val.status!=200){
+        //repeat till we get a good value
+        let url:string = response.url || "";
+        this.client.get(url,{
+          observe: "response",
+          responseType: "json"
+        }).toPromise().then(v=>{response=v});
+      }
+      //get corelimit
+      let rateLimit:RateLimit = response.body as RateLimit;
+      let corelimit:CoreLimit = rateLimit.resources.core;
+      return corelimit;
+    })).pipe(mergeMap(val=>{
+      let wait_period:Date =new Date(val.reset*1000);
+      let obsv: Observable<CoreLimit> = new Observable(sub=>{
+        sub.next(val)
+        sub.complete()
+      });
+
+      if(wait_period.getTime()>new Date().getTime()){
+        console.log("WAIT_TILL_CORE: ",wait_period)
         obsv = obsv.pipe(delay(wait_period));
       }
       return obsv;
@@ -157,22 +188,27 @@ export class GithubServiceService {
       return this.getFullPRURls(response);
     })).pipe(mergeMap(val=>{
       let repu_url = val.repository_url;
-      return this.client.get(repu_url,{
-        observe: "response",
-        responseType: "json"
-      }).pipe(map(resp=>{
-        let response = resp;
-        while(response.status!=200){
-          //meaning request not successful, then repeat
-          this.client.get(response.url || "",{
-            observe: "response",
-            responseType: "json"
-          }).toPromise().then(val=>{response=val});
-        }
-        let avator_url:string = (response.body as RepoURL).owner.avatar_url;
-        val.repo_pic=avator_url;
-        return val
-      }))
+      return this.checkCoreLimitAndWaitTillReday().pipe(mergeMap(vl=>{
+        return this.client.get(repu_url,{
+          observe: "response",
+          responseType: "json"
+        }).pipe(map(resp=>{
+          let response = resp;
+          while(response.status!=200){
+            //meaning request not successful, then repeat
+            this.checkCoreLimitAndWaitTillReday().pipe(mergeMap(v=>{
+              return this.client.get(response.url || "",{
+                observe: "response",
+                responseType: "json"
+              });
+            })).toPromise().then(v=>{response=v});
+          }
+          let avator_url:string = (response.body as RepoURL).owner.avatar_url;
+          val.repo_pic=avator_url;
+          return val
+        }))
+
+      }))    
     }))
   }  
 }
