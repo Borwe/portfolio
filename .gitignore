@@ -47,3 +47,8 @@ Thumbs.db
 
 #vim
 *.swp
+
+
+# Added by cargo
+
+/target
