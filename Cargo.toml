@@ -8,3 +8,6 @@ edition = "2021"
 [dependencies]
 actix-web = "3"
 reqwest = "0.11.9"
+
+[build-dependencies]
+dirs = "4.0.0"
