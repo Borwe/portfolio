@@ -53,3 +53,6 @@ Thumbs.db
 
 /target
 .env
+
+# Added for docker-compose db
+./test/db
