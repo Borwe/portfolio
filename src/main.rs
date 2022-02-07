@@ -4,6 +4,8 @@ use std::path::Path;
 use std::fs;
 use std::sync::Arc;
 use futures::future;
+use dotenv::dotenv;
+use tokio_postgres::connect;
 
 async fn files(req: HttpRequest, files: web::Data<Arc<Vec<String>>>)-> Result<afs::NamedFile>{
   let path: String = req.match_info().query("filename").parse().unwrap();
@@ -47,12 +49,26 @@ async fn start_db_filling() -> std::io::Result<()>{
   Ok(())
 }
 
-#[actix_web::main]
+#[tokio::main]
 async fn main() -> std::io::Result<()>{
+  dotenv().ok();
+  let postgres_port = match std::env::var("POSTGRES_PORT") {
+    Ok(x) => x,
+    Err(_) => "5432".to_string()
+  };
+  let postgres_password = match std::env::var("POSTGRES_PASSWORD"){
+    Ok(x) => x,
+    Err(_) => "test".to_string()
+  };
+  
   // get items that can be served to the db
   let mut items_in_dir = Vec::<String>::new();
   get_items_in_dir(Path::new("./dist/"), &mut items_in_dir)?;
   let items_in_dir = Arc::<Vec<String>>::from(items_in_dir);
+
+  //object for connecting to db and client
+  let connection_string = std::format!("host=0.0.0.0 user=postgres password={} port={}",postgres_password,postgres_port);
+  let (client, connection) = connect(&connection_string,tokio_postgres::NoTls).await.unwrap();
 
   // check if db pr's or projects is empty.
   // if yes, then get the data to fill it up with
@@ -60,6 +76,9 @@ async fn main() -> std::io::Result<()>{
   // is new data.
 
   let get_data_fut = get_data_from_github();
+
+  let local = tokio::task::local::LocalSet::new();
+  let sys = actix_web::rt::System::run_in_tokio("server",&local);
 
   let server = HttpServer::new(move ||{
     App::new().data(Arc::clone(&items_in_dir))
@@ -69,6 +88,8 @@ async fn main() -> std::io::Result<()>{
 
   let output = future::join(get_data_fut,server);
   let (get_data_result, server_result) = output.await;
+
+  sys.await?;
   get_data_result?;
   server_result?;
   Ok(())
