@@ -39,19 +39,11 @@ fn get_items_in_dir(dir: &Path, items_in_dir: &mut Vec<String>) -> std::io::Resu
   Ok(())
 }
 
-async fn get_data_from_github() -> std::io::Result<()>{
-  std::thread::sleep(std::time::Duration::from_secs(40));
-  println!("Hello, world!");
-  Ok(())
-}
-
 async fn start_db_filling() -> std::io::Result<()>{
   Ok(())
 }
 
-#[tokio::main]
-async fn main() -> std::io::Result<()>{
-  dotenv().ok();
+async fn grepping_github_service() -> std::io::Result<()> {
   let postgres_port = match std::env::var("POSTGRES_PORT") {
     Ok(x) => x,
     Err(_) => "5432".to_string()
@@ -60,37 +52,47 @@ async fn main() -> std::io::Result<()>{
     Ok(x) => x,
     Err(_) => "test".to_string()
   };
-  
-  // get items that can be served to the db
-  let mut items_in_dir = Vec::<String>::new();
-  get_items_in_dir(Path::new("./dist/"), &mut items_in_dir)?;
-  let items_in_dir = Arc::<Vec<String>>::from(items_in_dir);
 
-  //object for connecting to db and client
   let connection_string = std::format!("host=0.0.0.0 user=postgres password={} port={}",postgres_password,postgres_port);
   let (client, connection) = connect(&connection_string,tokio_postgres::NoTls).await.unwrap();
+  println!("DB connection possible");
+  Ok(())
+}
+
+fn main() -> std::io::Result<()>{
+  dotenv().ok();
 
   // check if db pr's or projects is empty.
   // if yes, then get the data to fill it up with
   // if not, then proceed to continue scrapping if there
   // is new data.
 
-  let get_data_fut = get_data_from_github();
 
-  let local = tokio::task::local::LocalSet::new();
-  let sys = actix_web::rt::System::run_in_tokio("server",&local);
+  // get items that can be served to the db
+  let mut items_in_dir = Vec::<String>::new();
+  get_items_in_dir(Path::new("./dist/"), &mut items_in_dir)?;
+  let items_in_dir = Arc::<Vec<String>>::from(items_in_dir);
+
+
+
+  let sys = actix_web::rt::System::with_tokio_rt(move ||{
+    //runtime for handling parsing github api, and inserting to db
+    tokio::runtime::Builder::new_multi_thread()
+      .enable_all()
+      .build().unwrap()
+  });
 
   let server = HttpServer::new(move ||{
-    App::new().data(Arc::clone(&items_in_dir))
+    App::new().app_data(actix_web::web::Data::new(Arc::clone(&items_in_dir)))
       .route("/",web::get().to(index))
       .route("/{filename:.*}",web::get().to(files))
   }).bind("0.0.0.0:8080")?.run();
 
-  let output = future::join(get_data_fut,server);
-  let (get_data_result, server_result) = output.await;
+  let combo = future::join(server,grepping_github_service());
 
-  sys.await?;
-  get_data_result?;
+  //used for running the server
+  let (server_result, grep_result) = sys.block_on(combo);
+  grep_result?;
   server_result?;
   Ok(())
 }
