@@ -6,6 +6,11 @@ use std::sync::Arc;
 use futures::future;
 use dotenv::dotenv;
 use tokio_postgres::connect;
+use tokio::sync::Mutex;
+
+mod models;
+mod constants;
+mod services;
 
 async fn files(req: HttpRequest, files: web::Data<Arc<Vec<String>>>)-> Result<afs::NamedFile>{
   let path: String = req.match_info().query("filename").parse().unwrap();
@@ -44,6 +49,10 @@ async fn start_db_filling() -> std::io::Result<()>{
 }
 
 async fn grepping_github_service() -> std::io::Result<()> {
+  Ok(())
+}
+
+async fn startup_setup() -> std::io::Result<()>{
   let postgres_port = match std::env::var("POSTGRES_PORT") {
     Ok(x) => x,
     Err(_) => "5432".to_string()
@@ -56,6 +65,13 @@ async fn grepping_github_service() -> std::io::Result<()> {
   let connection_string = std::format!("host=0.0.0.0 user=postgres password={} port={}",postgres_password,postgres_port);
   let (client, connection) = connect(&connection_string,tokio_postgres::NoTls).await.unwrap();
   println!("DB connection possible");
+  tokio::spawn(async move {
+      if let Err(e) = connection.await{
+        eprintln!("connection error: {}",e);
+      }
+  });
+
+  let client = Arc::new(Mutex::new(client));
   Ok(())
 }
 
