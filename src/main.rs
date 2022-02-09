@@ -60,7 +60,8 @@ async fn start(items_in_dir: Arc::<Vec<String>>) -> std::io::Result<()> {
   Ok(())
 }
 
-async fn startup_setup() -> std::io::Result<()>{
+async fn startup_setup() -> 
+  std::io::Result<Arc<Mutex<tokio_postgres::Client>>>{
   let postgres_port = match std::env::var("POSTGRES_PORT") {
     Ok(x) => x,
     Err(_) => "5432".to_string()
@@ -69,9 +70,20 @@ async fn startup_setup() -> std::io::Result<()>{
     Ok(x) => x,
     Err(_) => "test".to_string()
   };
+  let postgres_user = match std::env::var("POSTGRES_USER"){
+    Ok(x) => x,
+    Err(_) => "postgres".to_string()
+  };
+  let postgres_dbname = match std::env::var("POSTGRES_DB"){
+    Ok(x) => x,
+    Err(_) => "test".to_string()
+  };
 
-  let connection_string = std::format!("host=0.0.0.0 user=postgres password={} port={}",postgres_password,postgres_port);
-  let (client, connection) = connect(&connection_string,tokio_postgres::NoTls).await.unwrap();
+  let connection_string = std::format!(
+    "host=0.0.0.0 user={} password={} port={} dbname={}",
+    postgres_user, postgres_password, postgres_port, postgres_dbname);
+  let (mut client, connection) = connect(&connection_string,
+     tokio_postgres::NoTls).await.unwrap();
   println!("DB connection possible");
   tokio::spawn(async move {
       if let Err(e) = connection.await{
@@ -79,8 +91,26 @@ async fn startup_setup() -> std::io::Result<()>{
       }
   });
 
-  let client = Arc::new(Mutex::new(client));
-  Ok(())
+  //query for creating pull_requests table if doesn't exist
+  let query = concat!("CREATE TABLE IF NOT EXISTS pull_requests (",
+      "id SERIAL PRIMARY KEY,",
+      "api_url TEXT NOT NULL,",
+      "repository TEXT NOT NULL,",
+      "icon_url TEXT NOT NULL,",
+      "html_url TEXT NOT NULL,",
+      "title TEXT NOT NULL,",
+      "state TEXT NOT NULL,",
+      "comments INT NOT NULL,",
+      "created_date TEXT NOT NULL,",
+      "body TEXT NOT NULL,",
+      "author_association TEXT NOT NULL",
+      ");");
+  let mut transaction = client.transaction().await.unwrap();
+  let prep_statement = transaction.prepare(query).await.unwrap();
+  transaction.execute(&prep_statement,&vec![]).await.unwrap();
+  transaction.commit().await.unwrap();
+
+  Ok(Arc::new(Mutex::new(client)))
 }
 
 fn main() -> std::io::Result<()>{
