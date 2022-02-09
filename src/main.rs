@@ -48,7 +48,15 @@ async fn start_db_filling() -> std::io::Result<()>{
   Ok(())
 }
 
-async fn grepping_github_service() -> std::io::Result<()> {
+async fn start(items_in_dir: Arc::<Vec<String>>) -> std::io::Result<()> {
+  startup_setup().await?;
+  let server = HttpServer::new(move ||{
+    App::new().app_data(actix_web::web::Data::new(Arc::clone(&items_in_dir)))
+      .route("/",web::get().to(index))
+      .route("/{filename:.*}",web::get().to(files))
+  }).bind("0.0.0.0:8080")?.run();
+
+  server.await?;
   Ok(())
 }
 
@@ -89,8 +97,6 @@ fn main() -> std::io::Result<()>{
   get_items_in_dir(Path::new("./dist/"), &mut items_in_dir)?;
   let items_in_dir = Arc::<Vec<String>>::from(items_in_dir);
 
-
-
   let sys = actix_web::rt::System::with_tokio_rt(move ||{
     //runtime for handling parsing github api, and inserting to db
     tokio::runtime::Builder::new_multi_thread()
@@ -98,17 +104,7 @@ fn main() -> std::io::Result<()>{
       .build().unwrap()
   });
 
-  let server = HttpServer::new(move ||{
-    App::new().app_data(actix_web::web::Data::new(Arc::clone(&items_in_dir)))
-      .route("/",web::get().to(index))
-      .route("/{filename:.*}",web::get().to(files))
-  }).bind("0.0.0.0:8080")?.run();
-
-  let combo = future::join(server,grepping_github_service());
-
-  //used for running the server
-  let (server_result, grep_result) = sys.block_on(combo);
-  grep_result?;
-  server_result?;
+  //used for running the main starting point
+  let _result = sys.block_on(start(Arc::clone(&items_in_dir)));
   Ok(())
 }

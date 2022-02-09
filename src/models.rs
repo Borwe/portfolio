@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use serde_json::Value;
 
 pub enum State{
   Open,
@@ -11,21 +12,23 @@ pub enum AuthorAssociation{
 }
 
 pub struct PullRequest{
-  api_url: String,
-  repository: String,
-  html_url: String,
-  title: String,
-  state: State,
-  comments: u64,
-  created_date: String,
-  body: String,
-  author_association: AuthorAssociation
+  pub api_url: String,
+  pub repository: String,
+  pub icon_url: String,
+  pub html_url: String,
+  pub title: String,
+  pub state: State,
+  pub comments: u64,
+  pub created_date: String,
+  pub body: String,
+  pub author_association: AuthorAssociation
 }
 
 impl PullRequest{
-  pub fn from(value: serde_json::Value) -> Self{
+  pub fn from(value: &Value) -> Self{
     let api_url: String = value["url"].as_str().unwrap().to_string();
     let repository: String = value["repository_url"].as_str().unwrap().to_string();
+    let icon_url: String = value["avatar_url"].as_str().unwrap().to_string();
     let html_url: String = value["html_url"].as_str().unwrap().to_string();
     let title: String = value["title"].as_str().unwrap().to_string();
     let comments: u64 = value["comments"].as_u64().unwrap();
@@ -40,9 +43,9 @@ impl PullRequest{
       author_association = AuthorAssociation::Contributer;
     }
 
-    PullRequest { api_url, repository,
-    html_url, title, state, comments,
-    created_date, body, author_association
+    PullRequest { api_url, repository, icon_url,
+      html_url, title, state, comments,
+      created_date, body, author_association
     }
   }
 }
