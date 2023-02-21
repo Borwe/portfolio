@@ -1,17 +1,18 @@
-import React, { Dispatch, useEffect, useRef, useState, SetStateAction, FC } from 'react';
+import React, { Dispatch, useEffect, useRef, useState, SetStateAction, FC, ReactElement } from 'react';
 import "./TopBar.css";
 
 const FLAG_GROWTH: number = 20;
 
 type TextProp = {
-  text: string
+  text: string,
+  href: string,
 };
 
 const TabListItem: FC<TextProp> = (prop: TextProp)=>{
   const span = prop.text.split("").map((c,i)=>{
     return <span key={i.toString()}>{c}</span>
   });
-  return <li className="tab_list_item">{span}</li>;
+  return <a href={prop.href}><li className="tab_list_item">{span}</li></a>;
 }
 
 function incrementFlagWidth(
@@ -94,18 +95,26 @@ const TopBar: React.FC = ()=>{
     }
   },[windowWidth, canvasblackPos]);
 
+  let expanded_menu: ReactElement<any,any>;
+  if(windowWidth>888){
+    expanded_menu = <>
+      <TabListItem href="#" text="Projects"/>
+        <TabListItem href="#" text="Opensource Contributions"/>
+        <TabListItem href="#"  text="About"/>
+        <TabListItem href="#"  text="Contact"/>
+      </>;
+  }else{
+    expanded_menu = <><span>m</span></>;
+  }
+
   return (
     <>
     <canvas id="topbar_canvas" ref={canvas_ref}/>
     <div  id="topbar" ref={top_bar_ref}>
-
       <h2>
       <ul id="tab_list">
-        <TabListItem  text="BOrwe"/>
-        <TabListItem text="Projects"/>
-        <TabListItem text="Opensource Contributions"/>
-        <TabListItem text="About"/>
-        <TabListItem text="Contact"/>
+        <TabListItem href="#" text="BOrwe"/>
+        {expanded_menu}
       </ul>
       </h2>
     </div>
