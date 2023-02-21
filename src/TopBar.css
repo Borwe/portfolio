@@ -1,0 +1,17 @@
+#topbar_canvas {
+    display: flex;
+    background-color: red;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 99;
+}
+
+#topbar {
+    display: flex;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 100;
+}
