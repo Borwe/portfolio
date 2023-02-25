@@ -1,123 +1,72 @@
-import React, { Dispatch, useEffect, useRef, useState, SetStateAction, FC, ReactElement } from 'react';
+import React, { useEffect, useState, FC } from 'react';
+import {Toolbar, AppBar, Button, Typography, IconButton} from "@mui/material";
+import MenuIcon from "@mui/icons-material/Menu";
+import { Box } from '@mui/system';
 import "./TopBar.css";
 
-const FLAG_GROWTH: number = 20;
+const pages = ["About","Credentials","Projects","Opensource Contributions","Links"];
 
-type TextProp = {
-  text: string,
-  href: string,
-};
-
-const TabListItem: FC<TextProp> = (prop: TextProp)=>{
-  const span = prop.text.split("").map((c,i)=>{
-    return <span key={i.toString()}>{c}</span>
-  });
-  return <a href={prop.href}><li className="tab_list_item">{span}</li></a>;
+const FlagBackground: FC = ()=>{
+  return <Box width={"100%"} height={"100%"} sx={{
+    position: "absolute",
+    display: "box",
+    top: "0px",
+    left: "0px",
+  }}>
+    <Box id="black"></Box>
+    <Box id="white1"></Box>
+    <Box id="red"></Box>
+    <Box id="white2"></Box>
+    </Box>
 }
 
-function incrementFlagWidth(
-  canvasblackPos: number, 
-  setCanvasBlackPos: Dispatch<SetStateAction<number>>){
-  setCanvasBlackPos(canvasblackPos+FLAG_GROWTH);
-}
-
-function handleAnimatingFlag(canvasLoaded: boolean,
-  setCanvasLoaded: Dispatch<SetStateAction<boolean>>,
-  canvasblackPos: number,
-  setCanvasBlackPos: Dispatch<SetStateAction<number>>,
-  canvas_ref: HTMLCanvasElement){
-  let ctx = canvas_ref.getContext("2d")!;
-
-  if(canvasblackPos + (FLAG_GROWTH) >= window.innerWidth - FLAG_GROWTH*7){
-    //meaning current canvasblackPos is well outside the range expected.
-    //then reset it to resonable level
-    setCanvasBlackPos(window.innerWidth - FLAG_GROWTH*7);
-  }
-
-  //draw green pos
-  ctx.fillStyle = "green";
-  ctx.shadowBlur = 0;
-  ctx.fillRect(0,0,canvasblackPos+(4*FLAG_GROWTH),canvas_ref.clientHeight);
-
-  //draw white pos
-  ctx.fillStyle = "white";
-  ctx.shadowColor = "black";
-  ctx.shadowBlur = 50;
-  ctx.fillRect(0,0,canvasblackPos+(3*FLAG_GROWTH),canvas_ref.clientHeight);
-
-  //draw red pos
-  ctx.fillStyle = "red";
-  ctx.shadowColor = "black";
-  ctx.shadowBlur = 50;
-  ctx.fillRect(0,0,canvasblackPos+(2*FLAG_GROWTH),canvas_ref.clientHeight);
-
-  //draw white pos
-  ctx.fillStyle = "white";
-  ctx.shadowColor = "black";
-  ctx.shadowBlur = 50;
-  ctx.fillRect(0,0,canvasblackPos+FLAG_GROWTH,canvas_ref.clientHeight);
-
-  //draw black pos
-  ctx.fillStyle = "black";
-  ctx.shadowColor = "black";
-  ctx.shadowBlur = 50;
-  ctx.fillRect(0,0,canvasblackPos,canvas_ref.clientHeight);
-
-  if(canvasblackPos + (FLAG_GROWTH) <= window.innerWidth - FLAG_GROWTH*7){
-    setTimeout(incrementFlagWidth,35,canvasblackPos,setCanvasBlackPos);
-  }
-}
-
+  
 const TopBar: React.FC = ()=>{
-  let canvas_ref  = useRef(HTMLCanvasElement.prototype);
-  let top_bar_ref = useRef(HTMLDivElement.prototype);
-  //marking that we have comleted with the flag animation
-  let [canvasLoaded, setCanvasLoaded] = useState(false);
-  let [canvasblackPos, setCanvasBlackPos] = useState(10);
-  let [windowWidth, setWindowWidth] = useState(0);
-
-  //handle resizing width of canvas
+  let [showExpandMenu, setShowExpandMenu] = useState(true);
   useEffect(()=>{
-    const update_width = ()=>{
-      setWindowWidth(window.innerWidth);
-      //doesn't matter if, good actually to go off page
-      canvas_ref.current.width = windowWidth+100;
-      canvas_ref.current.height = top_bar_ref.current.clientHeight;
+    const windowChangeListener = (event: UIEvent )=>{
+      if(window.innerWidth<880){
+	setShowExpandMenu(false);
+      }else{
+	setShowExpandMenu(true);
+      }
     }
-
-    update_width();
-    handleAnimatingFlag(canvasLoaded, setCanvasLoaded,
-      canvasblackPos, setCanvasBlackPos,canvas_ref.current);
-
-    window.addEventListener("resize",update_width);
+    window.addEventListener("resize", windowChangeListener );
     return ()=>{
-      window.removeEventListener("resize",update_width);
+      window.removeEventListener("resize",windowChangeListener);
     }
-  },[windowWidth, canvasblackPos]);
+  },[showExpandMenu]);
 
-  let expanded_menu: ReactElement<any,any>;
-  if(windowWidth>888){
-    expanded_menu = <>
-      <TabListItem href="#" text="Projects"/>
-        <TabListItem href="#" text="Opensource Contributions"/>
-        <TabListItem href="#"  text="About"/>
-        <TabListItem href="#"  text="Contact"/>
-      </>;
-  }else{
-    expanded_menu = <><span>m</span></>;
+  const MenuToDisplay = ()=>{
+    if(showExpandMenu==false){
+      return <IconButton>
+	<MenuIcon sx={{color: 'white', zIngex: 99}}/>
+	</IconButton>
+    }else{
+      
+      return pages.map((p, i)=>{
+	  return <Button key={i.toString()}
+	  sx={{
+	    color: 'white',
+	    display: 'inline',
+	  }}>
+	  <Typography variant="button" sx={{zIngex: 99}}
+	      display="block" mr={1} ml={1}>{p}</Typography>
+	  </Button>
+      });
+    }
   }
 
   return (
     <>
-    <canvas id="topbar_canvas" ref={canvas_ref}/>
-    <div  id="topbar" ref={top_bar_ref}>
-      <h2>
-      <ul id="tab_list">
-        <TabListItem href="#" text="BOrwe"/>
-        {expanded_menu}
-      </ul>
-      </h2>
-    </div>
+    <AppBar>
+      <Toolbar sx={{backgroundColor: "green"}}>
+      <FlagBackground />
+      <Box sx={{zIndex: 99}}>
+      {MenuToDisplay()}
+	</Box>
+      </Toolbar>
+    </AppBar>
     </>
   );
 }
