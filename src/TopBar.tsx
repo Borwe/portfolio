@@ -31,6 +31,9 @@ const TopBar: React.FC = ()=>{
 	setShowExpandMenu(true);
       }
     }
+    if(window.innerWidth<880){
+      setShowExpandMenu(false);
+    }
     window.addEventListener("resize", windowChangeListener );
     return ()=>{
       window.removeEventListener("resize",windowChangeListener);

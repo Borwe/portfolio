@@ -1,6 +1,7 @@
 import { randomBytes } from 'crypto';
 import React from 'react';
 import TopBar from './TopBar';
+import Footer from './Footer';
 
 function App() {
   const WOOTS = [100].map((x)=><h2>HOOT</h2>);
@@ -54,6 +55,8 @@ function App() {
     <br/>HELLO!
     <br/>HELLO!
     <br/>HELLO!
+    <br/>WEMBE!
+    <Footer/>
 	  </>
   );
 }
