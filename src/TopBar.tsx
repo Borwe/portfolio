@@ -26,7 +26,8 @@ const MenuDrawer: FC<MenuDrawerProps> = (props: MenuDrawerProps)=>{
     onClose={(event, reason)=>{ props.showMenuAction(false)}}>
 
     <Box sx={{zIndex: 99, position: "absolute", right: 0, top: 0}}>
-    <IconButton sx={{color: "white"}} size="large"
+    <IconButton sx={{color: "white", backgroundColor: "#222222",
+	marginRight: "10px", marginTop: "10px"}} size="small"
     onClick={handleCloseButton}>
     <CloseRounded fontSize="large"/>
     </IconButton>
