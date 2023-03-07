@@ -1,11 +1,18 @@
-import { randomBytes } from 'crypto';
-import React from 'react';
+import React, { useEffect } from 'react';
 import TopBar from './TopBar';
 import Footer from './Footer';
 import Content from './Content';
+import {useAppDispatch, useAppSelector} from "./redux/hooks";
+import { screenChanged } from './redux/windowSlice';
 
 function App() {
-  const WOOTS = [100].map((x)=><h2>HOOT</h2>);
+	const windowInfo = useAppSelector((state)=> state.windows);
+	const dispatch = useAppDispatch();
+	useEffect(()=>{
+		window.addEventListener("resize",(event: UIEvent)=>{
+			dispatch(screenChanged());
+		});
+	},[windowInfo, dispatch]);
   return (<>
     <TopBar/>
     <Content/>
