@@ -6,13 +6,12 @@ import {useAppDispatch, useAppSelector} from "./redux/hooks";
 import { screenChanged } from './redux/windowSlice';
 
 function App() {
-	const windowInfo = useAppSelector((state)=> state.windows);
 	const dispatch = useAppDispatch();
 	useEffect(()=>{
 		window.addEventListener("resize",(event: UIEvent)=>{
 			dispatch(screenChanged());
 		});
-	},[windowInfo, dispatch]);
+	},[dispatch]);
   return (<>
     <TopBar/>
     <Content/>
