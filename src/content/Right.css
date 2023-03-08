@@ -1,9 +1,49 @@
 #right {
-  background-color: green;
+  background-color: black;
   height: 100%;
   width: 50%;
   position: fixed;
   top: 50;
   right: 0;
   z-index: 99;
+}
+
+@keyframes anim_up_down {
+	0% {bottom: -10%;}
+	50% {bottom: 8%;}
+	100% {bottom: -10%}
+}
+
+#right_img_top {
+	height: 100%;
+	bottom: -10%;
+	position: absolute;
+	z-index: 99;
+	animation-name: anim_up_down;
+	animation-duration: 8s;
+	animation-iteration-count: infinite;
+}
+
+#right_img_red_mid {
+	height: 100%;
+	bottom: -10%;
+	position: absolute;
+	z-index: 98;
+	left: 5px;
+	animation-name: anim_up_down;
+	animation-duration: 8s;
+	animation-iteration-count: infinite;
+	animation-delay: 1s;
+}
+
+#right_img_green {
+	height: 100%;
+	bottom: -10%;
+	position: absolute;
+	z-index: 97;
+	left: 10px;
+	animation-name: anim_up_down;
+	animation-duration: 8s;
+	animation-iteration-count: infinite;
+	animation-delay: 2s;
 }

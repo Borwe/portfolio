@@ -87,7 +87,6 @@ const TopBar: React.FC = () => {
 
 	useEffect(() => {
 		if (windowInfo.width < 880) {
-			console.log("SMALLING");
 			setShowExpandMenu(false);
 		} else {
 			setShowExpandMenu(true);
