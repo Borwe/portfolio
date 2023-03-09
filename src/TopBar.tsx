@@ -4,13 +4,18 @@ import { CloseRounded } from "@mui/icons-material";
 import MenuIcon from "@mui/icons-material/Menu";
 import { Box } from '@mui/system';
 import "./TopBar.css";
-import { useAppSelector } from './redux/hooks';
-import { Sections } from './redux/sectionSlice';
+import { useAppDispatch, useAppSelector } from './redux/hooks';
+import { Sections, setSection } from './redux/sectionSlice';
+import { AppDispatch } from './redux/store';
+
+
+type UseDispatchFunc = ReturnType< typeof useAppDispatch>;
 
 type MenuDrawerProps = {
 	show: boolean,
 	showMenuAction: Dispatch<SetStateAction<boolean>>,
-	sections: Sections
+	sections: Sections,
+	dispatcher: UseDispatchFunc,
 }
 
 const MenuDrawer: FC<MenuDrawerProps> = (props: MenuDrawerProps) => {
@@ -41,16 +46,18 @@ const MenuDrawer: FC<MenuDrawerProps> = (props: MenuDrawerProps) => {
 				marginTop: 10
 			}}>
 
-
 				{
 					props.sections.sections.map((p, i) => {
-						return <Button variant="text" key={i.toString()}
-							sx={{
+						const style: any = {
 								textAlign: "right",
 								color: 'white',
 								display: 'block',
 								width: "100%"
-							}}>
+						};
+						return <Button 
+							onClick={()=>onClickMenuButton(props.dispatcher, i)}
+							variant={i==props.sections.selected?"contained":"text"}
+							color="error"  key={i.toString()} sx={style}>
 							<Typography variant="subtitle1" sx={{ zIndex: 99 }}
 								display="block" m={1} >{p}</Typography>
 						</Button>
@@ -79,9 +86,15 @@ const FlagBackground: FC = () => {
 	</Box>
 }
 
+
+const onClickMenuButton = (dispatcher: UseDispatchFunc, pos: number) => {
+	dispatcher(setSection(pos));
+}
+
 const TopBar: React.FC = () => {
 	const windowInfo = useAppSelector(state => state.windows);
 	const sections = useAppSelector(state => state.sections);
+	const dispatcher = useAppDispatch();
 	let [showExpandMenu, setShowExpandMenu] = useState(true);
 	let [showMenuDrawer, setShowMenuDrawer] = useState(false);
 
@@ -107,6 +120,9 @@ const TopBar: React.FC = () => {
 
 			return sections.sections.map((p, i) => {
 				return <Button key={i.toString()}
+					onClick={()=>onClickMenuButton(dispatcher, i)}
+					variant={i==sections.selected?"contained":"text"}
+					color="error"
 					sx={{
 						color: 'white',
 						display: 'inline',
@@ -127,7 +143,9 @@ const TopBar: React.FC = () => {
 						{MenuToDisplay()}
 					</Box>
 				</Toolbar>
-				<MenuDrawer sections={sections} show={showMenuDrawer} showMenuAction={setShowMenuDrawer} />
+				<MenuDrawer 
+					sections={sections}  dispatcher={dispatcher}
+					show={showMenuDrawer} showMenuAction={setShowMenuDrawer} />
 			</AppBar>
 		</>
 	);
