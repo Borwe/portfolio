@@ -9,14 +9,14 @@
 }
 
 @keyframes anim_up_down {
-	0% {bottom: -10%;}
-	50% {bottom: 8%;}
-	100% {bottom: -10%}
+	0% {bottom: -13%;}
+	50% {bottom: 5%;}
+	100% {bottom: -13%}
 }
 
 #right_img_top {
 	height: 100%;
-	bottom: -10%;
+	bottom: -13%;
 	position: absolute;
 	z-index: 99;
 	animation-name: anim_up_down;
@@ -26,7 +26,7 @@
 
 #right_img_red_mid {
 	height: 100%;
-	bottom: -10%;
+	bottom: -13%;
 	position: absolute;
 	z-index: 98;
 	left: 5px;
@@ -38,7 +38,7 @@
 
 #right_img_green {
 	height: 100%;
-	bottom: -10%;
+	bottom: -13%;
 	position: absolute;
 	z-index: 97;
 	left: 10px;

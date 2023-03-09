@@ -5,13 +5,12 @@ import MenuIcon from "@mui/icons-material/Menu";
 import { Box } from '@mui/system';
 import "./TopBar.css";
 import { useAppSelector } from './redux/hooks';
-
-const pages = ["About", "Credentials", "Projects", "Opensource Contributions", "Links"];
-
+import { Sections } from './redux/sectionSlice';
 
 type MenuDrawerProps = {
 	show: boolean,
-	showMenuAction: Dispatch<SetStateAction<boolean>>
+	showMenuAction: Dispatch<SetStateAction<boolean>>,
+	sections: Sections
 }
 
 const MenuDrawer: FC<MenuDrawerProps> = (props: MenuDrawerProps) => {
@@ -44,7 +43,7 @@ const MenuDrawer: FC<MenuDrawerProps> = (props: MenuDrawerProps) => {
 
 
 				{
-					pages.map((p, i) => {
+					props.sections.sections.map((p, i) => {
 						return <Button variant="text" key={i.toString()}
 							sx={{
 								textAlign: "right",
@@ -81,7 +80,8 @@ const FlagBackground: FC = () => {
 }
 
 const TopBar: React.FC = () => {
-	let windowInfo = useAppSelector(state => state.windows);
+	const windowInfo = useAppSelector(state => state.windows);
+	const sections = useAppSelector(state => state.sections);
 	let [showExpandMenu, setShowExpandMenu] = useState(true);
 	let [showMenuDrawer, setShowMenuDrawer] = useState(false);
 
@@ -105,7 +105,7 @@ const TopBar: React.FC = () => {
 			</IconButton>
 		} else {
 
-			return pages.map((p, i) => {
+			return sections.sections.map((p, i) => {
 				return <Button key={i.toString()}
 					sx={{
 						color: 'white',
@@ -127,7 +127,7 @@ const TopBar: React.FC = () => {
 						{MenuToDisplay()}
 					</Box>
 				</Toolbar>
-				<MenuDrawer show={showMenuDrawer} showMenuAction={setShowMenuDrawer} />
+				<MenuDrawer sections={sections} show={showMenuDrawer} showMenuAction={setShowMenuDrawer} />
 			</AppBar>
 		</>
 	);
