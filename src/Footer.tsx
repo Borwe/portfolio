@@ -6,7 +6,7 @@ const Footer: FC = ()=>{
   return (<>
     <Box sx={{
       display: "block",
-      position: "sticky",
+      position: "fixed",
       bottom: 0,
       left: 0,
       width: "100%",
