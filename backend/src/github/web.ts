@@ -1,6 +1,6 @@
 import axios, { AxiosInstance } from "axios";
 import dotenv from "dotenv";
-import { asyncRun } from "../utils/functions";
+import { asyncRun, sleep } from "../utils/functions";
 import { generatePullRequestLink, generatePullRequestLinkWithPage } from "./consts";
 import { PullRequest } from "./models";
 
@@ -64,6 +64,15 @@ export class Api {
     this.initialized=true;
   }
 
+  private async doHubSearch<T>(url: string){
+    await this.init();
+    if(this.searchInfo.limit<=0){
+      let waitTime = Math.abs(this.searchInfo.reset- nowInMicroSeconds());
+      await sleep(waitTime);
+    }
+    return await asyncRun(this.axiosInstance.get<T>(url));
+  }
+
   /**
    * @user here is the github user account name.
    * @all means, to get all pull requests on all pages
@@ -73,19 +82,9 @@ export class Api {
     if(this.initialized==false){
       throw new Error("Didn't call initialize on this object atleast once");
     }
-    if(this.searchInfo.remaining==0){
-      //sleep for difference in time
-      let waitTime = Math.abs(this.searchInfo.reset- nowInMicroSeconds());
-      await new Promise(resolve => 
-        setTimeout(resolve, waitTime));
-      await this.init();//reset timers for search
-    }
     const url = generatePullRequestLink(user);
-    const [d, err] = await asyncRun(this.axiosInstance.get<PRsListResponse>(url));
+    const [d, err] = await this.doHubSearch<PRsListResponse>(url);
 
-    if(err){
-      throw new Error(err);
-    }
     let pullRequests = new Array<PullRequest>();
     d!.data.items.forEach(p=>pullRequests.push(p));
 
@@ -97,13 +96,12 @@ export class Api {
       //hold all the REST requests here
       let promises = new Array<Promise<[typeof d, typeof err]>>();
       do{
-        next_page = current_page;
         next_page = this.getNextPageNumberInSearch(
           current_page,total_items);
         if(next_page !=current_page){
+          current_page = next_page;
           const url = generatePullRequestLinkWithPage(user, next_page);
-          promises.push(
-            asyncRun(this.axiosInstance.get<PRsListResponse>(url)));
+          promises.push(this.doHubSearch<PRsListResponse>(url));
         }
       }while(next_page!=current_page);
       

@@ -7,3 +7,6 @@ export async function asyncRun<T>(promise: Promise<T>)
     return [undefined, e]
   }
 }
+
+export const sleep = async (waitTime: number)=> 
+  await new Promise(resolve => setTimeout(resolve, waitTime));

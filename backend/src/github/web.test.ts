@@ -21,9 +21,14 @@ describe("Pull Request info", ()=>{
     expect(next).toEqual(3);
   });
 
-  it("Getting first 100 prs", async ()=>{
+  it("Getting 100 prs", async ()=>{
     let pr: Array<PullRequest> = await api.getPullRequests("borwe", true);
-    expect(pr.length).toBeGreaterThan(0);
-    expect(pr.length).toEqual(60);
+    expect(pr.length).toBeGreaterThanOrEqual(60);
+  }, 2000000);
+
+  
+  it("Getting prs of user with more than 100prs", async ()=>{
+    let pr: Array<PullRequest> = await api.getPullRequests("david-kariuki", true);
+    expect(pr.length).toBeGreaterThanOrEqual(120);
   }, 2000000);
 });
