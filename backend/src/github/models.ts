@@ -26,6 +26,10 @@ export class PullRequest {
     if(this.data.org_icon!=undefined){
       return this.data.org_icon!;
     }
-    return "";
+    throw new Error("org_icon field empty");
+  }
+
+  setOrgIcon(url: string){
+    this.data.org_icon = url;
   }
 }
