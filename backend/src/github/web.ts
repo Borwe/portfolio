@@ -96,7 +96,8 @@ export class Api {
 	*/
 	async getPullRequests(user: string, all: boolean): Promise<Array<PullRequest>> {
 		if (this.initialized == false) {
-			throw new Error("Didn't call initialize on this object atleast once");
+			await this.init();
+			this.initialized = true;
 		}
 		const url = generatePullRequestLink(user);
 		const [d, err] = await this.doHubSearch<PRsListResponse>(url);

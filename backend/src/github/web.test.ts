@@ -5,10 +5,6 @@ import { Api } from "./web";
 describe("Pull Request info", ()=>{
   let api = new Api();
 
-  beforeAll(async ()=>{
-    await api.init();
-  }, 2000000);
-
   it("Test pagenumbers",()=>{
     //search items is 100.
     const total_items = 250;
