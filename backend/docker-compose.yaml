@@ -1,0 +1,7 @@
+version: "3"
+services:
+  db:
+    image: "postgres:bullseye"
+    ports: 
+      - 5400:5432
+    env_file: .env
