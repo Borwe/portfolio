@@ -1,17 +1,19 @@
-import { describe, it, expect, afterAll, beforeAll} from "@jest/globals";
+import { describe, it, expect} from "@jest/globals";
 import { Api } from "../github/web";
-import {addNewPRsToDBFresh, migrateDB} from "./db";
+import {addNewPRsToDBFresh, migrateDB, getPrsFromDB} from "./db";
 
-describe("test creating/connecting to db", ()=>{
-  const webApi = new Api();
-
-
+const webApi = new Api();
+describe("test creation/migration to db", ()=>{
   it("Test migration if success", async ()=>{
     const [_, err] = await migrateDB();
     expect(err).toBeUndefined();
   });
 
-  it("Test inserting to pull_requests", async ()=>{
+
+});
+
+describe("Tests adding to DB",()=>{
+  it("inserting to pull_requests", async ()=>{
     const [r, err] = await addNewPRsToDBFresh("borwe", webApi, true);
     expect(err).toBeUndefined();
     expect(r).toBeGreaterThanOrEqual(60); //at this time I have 60 prs
@@ -22,5 +24,12 @@ describe("test creating/connecting to db", ()=>{
     expect(err2).toBeUndefined();
     expect(r2).toEqual(0); //at this time I have 60 prs
   }, 2000000);
+});
 
+describe("Tests getting from db", ()=>{
+  it("get prs from db", async ()=>{
+    const [r, err ] = await getPrsFromDB();
+    expect(err).toBeUndefined();
+    expect(r!.length).toBeGreaterThanOrEqual(60);
+  }, 2000000);
 });

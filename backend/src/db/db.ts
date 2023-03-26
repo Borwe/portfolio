@@ -2,6 +2,7 @@ import { asyncRun } from "../utils/functions";
 import { migrate, createDb } from "postgres-migrations";
 import { Pool} from "pg";
 import { Api } from "../github/web";
+import { PullRequest } from "../github/models";
 
 const PASSWORD: string = process.env.PASSWORD==undefined?
   "password":process.env.PASSWORD;
@@ -20,7 +21,6 @@ export const pool = new Pool({
   password: PASSWORD,
   port: DBPORT,
   database: DBNAME,
-  max: 3
 });
 
 export async function migrateDB(): Promise<[boolean, any]>{
@@ -77,4 +77,38 @@ export async function addNewPRsToDBFresh(username: string, webApi: Api,
     client!.release();
 
     return [nums, undefined];
+}
+
+export async function getPrsFromDB():
+  Promise<[Array<PullRequest> | undefined, any]>{
+  let [client, err] = await asyncRun(pool.connect());
+  if(err){
+    return [undefined, err];
+  }
+
+  const select_query = "SELECT * FROM pull_requests";
+  let [result, e] = await asyncRun(client!.query(select_query));
+  if(e){
+    client!.release();
+    return [undefined, e];
+  }
+
+  let prs = new Array<PullRequest>();
+  result!.rows.forEach(row =>{
+    let pr = new PullRequest({
+      url: row.url,
+      repository_url: row.repository_url,
+      html_url: row.html_url,
+      title: row.title,
+      updated_at: row.updated_at,
+      created_at: row.created_at,
+      body: row.body,
+      org_icon: row.org_icon,
+      pull_request: {
+        merged_at: row.pull_request
+      }
+    });
+    prs.push(pr);
+  });
+  return [prs, undefined];
 }
