@@ -46,13 +46,13 @@ export async function migrateDB(): Promise<[boolean, any]>{
   return [true, undefined];
 };
 
-export async function addNewPRsToDBFresh(username: string, webApi: Api): 
-  Promise<[number | undefined, any]>{
+export async function addNewPRsToDBFresh(username: string, webApi: Api,
+  all: boolean): Promise<[number | undefined, any]>{
     let [client, err] = await asyncRun(pool.connect());
     if(err){
       return [undefined, err];
     }
-    const prs = await webApi.getPullRequests("borwe", true);
+    const prs = await webApi.getPullRequests("borwe", all);
     let nums = 0;
 
     //get client
@@ -72,8 +72,6 @@ export async function addNewPRsToDBFresh(username: string, webApi: Api):
         nums+=1;
       }catch(e){
         await client!.query("ROLLBACK");
-        console.log("ERROR:",e);
-        return [undefined, e];
       }
     }
     client!.release();

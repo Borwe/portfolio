@@ -1,6 +1,6 @@
 CREATE TABLE pull_requests (
   id SERIAL,
-  url text NOT NULL,
+  url text NOT NULL UNIQUE,
   repository_url text NOT NULL,
   html_url text NOT NULL,
   title text NOT NULL,
