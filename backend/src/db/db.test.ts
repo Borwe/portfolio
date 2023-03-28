@@ -1,6 +1,6 @@
 import { describe, it, expect} from "@jest/globals";
 import { Api } from "../github/web";
-import {addNewPRsToDBFresh, migrateDB, getPrsFromDB, setTimeDB} from "./db";
+import {addNewPRsToDBFresh, migrateDB, getPrsFromDB, setTimeDB, getLastTimeDB} from "./db";
 
 const webApi = new Api();
 describe("test creation/migration to db", ()=>{
@@ -34,6 +34,15 @@ describe("Tests getting from db", ()=>{
   }, 2000000);
 });
 
+
+describe("Testing getting Time When empty",()=>{
+	it("getTime when unset should have error", async ()=>{
+		const [re, er] = await getLastTimeDB();
+		expect(er!=undefined).toBeTruthy();
+		expect(re).toBeFalsy();
+	});
+});
+
 describe("Test updating time", ()=>{
   it("setTime", async ()=>{
     const time = new Date().toString();
@@ -49,4 +58,12 @@ describe("Test updating time", ()=>{
     expect(e).toBeUndefined();
     expect(s).toBeTruthy();
   })
+});
+
+describe("Testing getting Time When filled",()=>{
+	it("getTime when unset should have no error", async ()=>{
+		const [re, er] = await getLastTimeDB();
+		expect(er).toBeUndefined();
+		expect(re).toBeTruthy();
+	});
 });

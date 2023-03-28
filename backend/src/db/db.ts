@@ -133,7 +133,7 @@ export async function setTimeDB(time: string): Promise<[boolean, any]>{
   }
   try {
     await client!.query("BEGIN");
-	await client!.query(insert_query, [new Date().toString()]);
+	await client!.query(insert_query, [time]);
     await client!.query("COMMIT");
 	return [true, undefined];
   }catch(e){
@@ -142,4 +142,23 @@ export async function setTimeDB(time: string): Promise<[boolean, any]>{
   }finally{
     client!.release();
   }
+}
+
+export async function getLastTimeDB(): Promise<[boolean, any]>{
+	const [client, er] = await asyncRun(pool.connect());
+	if(er!=undefined){
+		return [false, er];
+	}
+
+	const select_query = "SELECT * from last_update";
+	let [rows, err] = await asyncRun(client!.query(select_query));
+	if(err!=undefined){
+		return [false, undefined];
+	}
+	if(rows!.rowCount!=1){
+		return [false,
+				new Error("Sorry, 0 or more than 1 row in last_update")];
+	}else{
+		return [true, err];
+	}
 }
