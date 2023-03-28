@@ -1,6 +1,6 @@
 import { describe, it, expect} from "@jest/globals";
 import { Api } from "../github/web";
-import {addNewPRsToDBFresh, migrateDB, getPrsFromDB} from "./db";
+import {addNewPRsToDBFresh, migrateDB, getPrsFromDB, setTimeDB} from "./db";
 
 const webApi = new Api();
 describe("test creation/migration to db", ()=>{
@@ -32,4 +32,21 @@ describe("Tests getting from db", ()=>{
     expect(err).toBeUndefined();
     expect(r!.length).toBeGreaterThanOrEqual(60);
   }, 2000000);
+});
+
+describe("Test updating time", ()=>{
+  it("setTime", async ()=>{
+    const time = new Date().toString();
+    let [s, e] = await setTimeDB(time);
+    expect(e).toBeUndefined();
+    expect(s).toBeTruthy();
+
+    [s, e] = await setTimeDB(time);
+    expect(e).toBeUndefined();
+    expect(s).toBeTruthy();
+
+    [s, e] = await setTimeDB(time);
+    expect(e).toBeUndefined();
+    expect(s).toBeTruthy();
+  })
 });

@@ -10,3 +10,8 @@ CREATE TABLE pull_requests (
   body text NOT NULL,
   org_icon text NOT NULL
 );
+
+CREATE TABLE last_update (
+  id SERIAL,
+  time text NOT NULL
+)

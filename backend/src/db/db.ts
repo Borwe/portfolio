@@ -112,3 +112,34 @@ export async function getPrsFromDB():
   });
   return [prs, undefined];
 }
+
+export async function setTimeDB(time: string): Promise<[boolean, any]>{
+  let [client, err] = await asyncRun(pool.connect());
+  if(err!=undefined){
+    return [false, err];
+  }
+  let select_query = "SELECT * from last_update";
+  const [rows, er]  = await asyncRun(client!.query(select_query));
+  if(er!=undefined){
+    return [false, er];
+  }
+
+  //insert into db if empty
+  let insert_query = "INSERT INTO last_update (time) VALUES ($1)";
+
+  if(rows!.rows.length>0){
+    //otherwise update time
+    insert_query = "UPDATE last_update SET time = ($1) WHERE id="+rows!.rows[0].id;
+  }
+  try {
+    await client!.query("BEGIN");
+	await client!.query(insert_query, [new Date().toString()]);
+    await client!.query("COMMIT");
+	return [true, undefined];
+  }catch(e){
+    client!.query("ROLLBACK");
+    return [false, e];
+  }finally{
+    client!.release();
+  }
+}
