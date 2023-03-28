@@ -52,7 +52,7 @@ export async function addNewPRsToDBFresh(username: string, webApi: Api,
     if(err){
       return [undefined, err];
     }
-    const prs = await webApi.getPullRequests("borwe", all);
+    const prs = await webApi.getPullRequests(username, all);
     let nums = 0;
 
     //get client
@@ -144,21 +144,22 @@ export async function setTimeDB(time: string): Promise<[boolean, any]>{
   }
 }
 
-export async function getLastTimeDB(): Promise<[boolean, any]>{
+export async function getLastTimeDB(): Promise<[Date | undefined, any]>{
 	const [client, er] = await asyncRun(pool.connect());
 	if(er!=undefined){
-		return [false, er];
+		return [undefined, er];
 	}
 
 	const select_query = "SELECT * from last_update";
 	let [rows, err] = await asyncRun(client!.query(select_query));
 	if(err!=undefined){
-		return [false, undefined];
+		return [undefined, undefined];
 	}
 	if(rows!.rowCount!=1){
-		return [false,
-				new Error("Sorry, 0 or more than 1 row in last_update")];
+		const now = new Date();
+		//set time to last year
+		return [new Date(now.getFullYear()-1, now.getMonth(), now.getDay()), undefined];
 	}else{
-		return [true, err];
+		return [new Date(rows!.rows[0].time), err];
 	}
 }

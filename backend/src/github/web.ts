@@ -1,4 +1,4 @@
-import axios, { AxiosInstance, AxiosResponse } from "axios";
+import axios, { AxiosInstance } from "axios";
 import dotenv from "dotenv";
 import { asyncRun, sleep } from "../utils/functions";
 import { generatePullRequestLink, generatePullRequestLinkWithPage } from "./consts";
@@ -76,7 +76,17 @@ export class Api {
 			let waitTime = Math.abs(this.searchInfo.reset - nowInMicroSeconds());
 			await sleep(waitTime);
 		}
-		return await asyncRun(this.axiosInstance.get<T>(url));
+		let [result, err] = await asyncRun(this.axiosInstance.get<T>(url));
+		while (err != undefined) {
+			await this.init();
+			if (this.searchInfo.limit <= 0) {
+				let waitTime = Math
+					.abs(this.searchInfo.reset - nowInMicroSeconds());
+				await sleep(waitTime);
+			}
+			[result, err] = await asyncRun(this.axiosInstance.get<T>(url));
+		}
+		return result!;
 	}
 
 
@@ -100,18 +110,18 @@ export class Api {
 			this.initialized = true;
 		}
 		const url = generatePullRequestLink(user);
-		const [d, err] = await this.doHubSearch<PRsListResponse>(url);
+		const d = await this.doHubSearch<PRsListResponse>(url);
 
 		let pullRequests = new Array<PullRequest>();
-		d!.data.items.forEach(p => pullRequests.push(new PullRequest(p)));
+		d.data.items.forEach(p => pullRequests.push(new PullRequest(p)));
 
 		if (all) {
 			//get all pages
-			const total_items = d!.data.total_count;
+			const total_items = d.data.total_count;
 			let current_page = 1;
 			let next_page = current_page;
 			//hold all the REST requests here
-			let promises = new Array<Promise<[typeof d, typeof err]>>();
+			let promises = new Array<Promise<typeof d>>();
 			do {
 				next_page = this.getNextPageNumberInSearch(
 					current_page, total_items);
@@ -122,11 +132,10 @@ export class Api {
 				}
 			} while (next_page != current_page);
 
-			(await Promise.all(promises)).filter(x => x[1] == undefined)
-				.map(x => x[0]).forEach(x => x?.data.items
-				.forEach(p =>{
+			(await Promise.all(promises)).
+				forEach(x => x?.data.items.forEach(p => {
 					pullRequests.push(new PullRequest(p));
-				} ));
+				}));
 		}
 
 		return await this.setupOrgImages(pullRequests);
@@ -141,7 +150,7 @@ export class Api {
 		};
 		let [d, err] = await this.doHubCore<RepoInfo>(
 			pullRequest.data.repository_url);
-		if(err){
+		if (err) {
 			return [false, err];
 		}
 
@@ -155,8 +164,8 @@ export class Api {
 		for (let i = 0; i < pullRequests.length; ++i) {
 			promises.push(this.getOrgUrlInfo(pullRequests[i]));
 		}
-		(await Promise.all(promises)).forEach(([b, er])=>{
-			if(b==false){
+		(await Promise.all(promises)).forEach(([b, er]) => {
+			if (b == false) {
 				throw er
 			}
 		});
