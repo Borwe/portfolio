@@ -74,7 +74,7 @@ export class Api {
 		await this.init();
 		if (this.searchInfo.limit <= 0) {
 			let waitTime = Math.abs(this.searchInfo.reset - nowInMicroSeconds());
-			await sleep(waitTime);
+			await sleep(waitTime * 1000);
 		}
 		let [result, err] = await asyncRun(this.axiosInstance.get<T>(url));
 		while (err != undefined) {
@@ -82,7 +82,7 @@ export class Api {
 			if (this.searchInfo.limit <= 0) {
 				let waitTime = Math
 					.abs(this.searchInfo.reset - nowInMicroSeconds());
-				await sleep(waitTime);
+				await sleep(waitTime*1000);
 			}
 			[result, err] = await asyncRun(this.axiosInstance.get<T>(url));
 		}
@@ -94,7 +94,7 @@ export class Api {
 		await this.init();
 		if (this.coreInfo.limit <= 0) {
 			let waitTime = Math.abs(this.searchInfo.reset - nowInMicroSeconds());
-			await sleep(waitTime);
+			await sleep(waitTime*1000);
 		}
 		return await asyncRun(this.axiosInstance.get<T>(url));
 	}
