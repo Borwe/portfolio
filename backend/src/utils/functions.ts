@@ -31,23 +31,27 @@ export async function loopAndFillDB(user: string, api: Api,
 		console.error("ERROR_GET_TIME_DB:", er);
 		return [undefined, er];
 	}
+	const [prs, prers] = await getPrsFromDB();
+	if(prers!=undefined){
+		console.error("ERROR_GET_PRS_DB:", prers);
+		return [undefined, prers];
+	}
 	//get the current time
 	let now = new Date();
 	//get difference between db time and now
-	const dif = now.getSeconds() - da!.getSeconds();
-	if (dif / (60 * 60) < hours_to_loop) {
+	const dif = (now.getMilliseconds()/(1000*60*60)) - (da!.getMilliseconds()/(1000*60*60));
+	if (dif < hours_to_loop && prs!.length!==0) {
 		//do a wait for the dif in time
-		await sleep(dif * 1000);
-	}
-	const [prs, epr] = await getPrsFromDB();
-	if (epr != undefined) {
-		console.error("ERROR_GET_PR_DB:", er);
-		return [undefined, epr];
+		console.log("DATE:",da!);
+		console.log("WTF sleeping?!!!!!:", prs!.length);
+		console.log("diff:",dif,"hour:", hours_to_loop);
+		const wait_time = (hours_to_loop - dif) * 60*60 ;
+		await sleep(wait_time * 1000);
 	}
 
-	const get_all_prs = prs!.length > 0 ? false : true;
+	console.log("LOLOL");
 	//get and add the prs to db
-	const [_added, adderr] = await addNewPRsToDBFresh(user, api, get_all_prs);
+	const [_added, adderr] = await addNewPRsToDBFresh(user, api, true);
 	if (adderr != undefined) {
 		console.error("ERROR_ADD_PR_DB:", er);
 		return [undefined, adderr];

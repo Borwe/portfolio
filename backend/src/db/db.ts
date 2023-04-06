@@ -6,18 +6,18 @@ import { PullRequest } from "../github/models";
 
 const PASSWORD: string = process.env.PASSWORD == undefined ?
 	"password" : process.env.PASSWORD;
-const HOST: string = process.env.HOSTENV == undefined ?
-	"localhost" : process.env.HOSTENV;
-const USER: string = process.env.USERDB == undefined ?
-	"postgres" : process.env.USERDB;
+const DBHOST: string = process.env.DBHOST == undefined ?
+	"localhost" : process.env.DBHOST;
+const DBUSER: string = process.env.DBUSER == undefined ?
+	"postgres" : process.env.DBUSER;
 const DBNAME: string = process.env.DBNAME == undefined ?
 	"github" : process.env.DBNAME;
 const DBPORT: number = process.env.DBPORT == undefined ?
-	5400 : +process.env.DBPORT.trim();
+	5432 : +process.env.DBPORT.trim();
 
 const pool = new Pool({
-	host: HOST,
-	user: USER,
+	host: DBHOST,
+	user: DBUSER,
 	password: PASSWORD,
 	port: DBPORT,
 	database: DBNAME,
@@ -25,9 +25,9 @@ const pool = new Pool({
 
 export async function migrateDB(): Promise<[boolean, any]> {
 	let [_a, err] = await asyncRun(createDb(DBNAME, {
-		user: USER,
+		user: DBUSER,
 		port: DBPORT,
-		host: HOST,
+		host: DBHOST,
 		password: PASSWORD
 	}));
 	if (err) {
@@ -35,9 +35,9 @@ export async function migrateDB(): Promise<[boolean, any]> {
 	}
 	const [_, merr] = await asyncRun(migrate({
 		database: DBNAME,
-		user: USER,
+		user: DBUSER,
 		password: PASSWORD,
-		host: HOST,
+		host: DBHOST,
 		port: DBPORT,
 	}, "./src/db/migrate/"));
 	if (merr) {
@@ -146,12 +146,12 @@ export async function getLastTimeDB(): Promise<[Date | undefined, any]> {
 	if (err != undefined) {
 		const now = new Date();
 		//set time to last year
-		return [new Date(now.getFullYear() - 1, now.getMonth(), now.getDay()), undefined];
+		return [new Date(now.getFullYear() , now.getMonth(), now.getDay()-1), undefined];
 	}
 	if (rows!.rowCount != 1) {
 		const now = new Date();
 		//set time to last year
-		return [new Date(now.getFullYear() - 1, now.getMonth(), now.getDay()), undefined];
+		return [new Date(now.getFullYear(), now.getMonth(), now.getDay()-1), undefined];
 	} else {
 		return [new Date(rows!.rows[0].time), err];
 	}

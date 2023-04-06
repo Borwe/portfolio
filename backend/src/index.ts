@@ -12,9 +12,9 @@ const PORT: number = process.env.PORT == undefined ? 4000 : +process.env.PORT.tr
 
 async function fillDB() {
 	let [mig, migErr] = await migrateDB();
-	if(migErr!= undefined || mig == false){
-		console.error("Migration failed");
-		throw mig;
+	while(migErr!= undefined || mig == false){
+		console.error("DB init migration init  failed retrying", migErr);
+		[mig, migErr] = await migrateDB();
 	}
 	//check if db filled, already atleast once
 	let [prs, er] = await getPrsFromDB();
@@ -27,6 +27,7 @@ async function fillDB() {
 	//keep on filling it in 24 hour intervals
 	while (true) {
 		let [_date, err] = await loopAndFillDB(USER_NAME, api, 24);
+		console.log("WTF!:",_date!.toString());
 		if (err != undefined) {
 			console.error(err);
 			throw err;

@@ -1,0 +1,9 @@
+**/node_modules
+dist/
+**/**/*.log
+
+.env
+.env_docker
+*~
+*.swp
+docker-compose.yaml
