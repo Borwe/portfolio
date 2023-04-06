@@ -67,7 +67,7 @@ export async function addNewPRsToDBFresh(username: string, webApi: Api,
 			await client!.query("BEGIN");
 			await client!.query(insert_query, [data.url, data.repository_url,
 			data.html_url, data.title, data.updated_at, data.created_at,
-			data.pull_request, data.body, data.org_icon]);
+			JSON.stringify(data.pull_request), data.body, data.org_icon]);
 			await client!.query("COMMIT");
 			nums += 1;
 		} catch (e) {
@@ -100,7 +100,7 @@ export async function getPrsFromDB():
 			body: row.body,
 			org_icon: row.org_icon,
 			pull_request: {
-				merged_at: row.pull_request
+				merged_at: JSON.parse(row.pull_request)
 			}
 		});
 		prs.push(pr);

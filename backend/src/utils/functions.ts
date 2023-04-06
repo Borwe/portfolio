@@ -46,7 +46,6 @@ export async function loopAndFillDB(user: string, api: Api,
 		await sleep(wait_time * 1000);
 	}
 
-	console.log("LOLOL");
 	//get and add the prs to db
 	const [_added, adderr] = await addNewPRsToDBFresh(user, api, true);
 	if (adderr != undefined) {

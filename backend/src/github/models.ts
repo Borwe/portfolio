@@ -1,5 +1,7 @@
 export type PullRequestMergedAt = {
-  merged_at: string | null;
+  merged_at: {
+    merged_at: string | undefined
+  }
 }
 
 export type PullRequestData = {

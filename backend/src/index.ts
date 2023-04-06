@@ -67,7 +67,8 @@ app.get("/opensource", async function(_, res){
 	}else{
 		const data_prs = prs!.filter(pr=>{
 			return !pr.data.url.toLowerCase().includes(USER_NAME)
-		}).map(pr=> pr.data);
+		}).filter(pr=> pr.data.pull_request.merged_at.merged_at != undefined)
+			.map(pr=> pr.data);
 		res.contentType("application/json");
 		res.json(data_prs);
 	}
