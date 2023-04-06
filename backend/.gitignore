@@ -3,5 +3,6 @@ dist/
 **/**/*.log
 
 .env
+.env_docker
 *~
 *.swp

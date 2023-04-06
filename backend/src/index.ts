@@ -27,7 +27,6 @@ async function fillDB() {
 	//keep on filling it in 24 hour intervals
 	while (true) {
 		let [_date, err] = await loopAndFillDB(USER_NAME, api, 24);
-		console.log("WTF!:",_date!.toString());
 		if (err != undefined) {
 			console.error(err);
 			throw err;

@@ -42,9 +42,6 @@ export async function loopAndFillDB(user: string, api: Api,
 	const dif = (now.getMilliseconds()/(1000*60*60)) - (da!.getMilliseconds()/(1000*60*60));
 	if (dif < hours_to_loop && prs!.length!==0) {
 		//do a wait for the dif in time
-		console.log("DATE:",da!);
-		console.log("WTF sleeping?!!!!!:", prs!.length);
-		console.log("diff:",dif,"hour:", hours_to_loop);
 		const wait_time = (hours_to_loop - dif) * 60*60 ;
 		await sleep(wait_time * 1000);
 	}
