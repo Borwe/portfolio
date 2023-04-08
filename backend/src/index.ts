@@ -13,7 +13,7 @@ const PORT: number = process.env.PORT == undefined ? 4000 : +process.env.PORT.tr
 async function fillDB() {
 	let [mig, migErr] = await migrateDB();
 	while(migErr!= undefined || mig == false){
-		console.error("DB init migration init  failed retrying", migErr);
+		console.error("DB init migration init failed retrying", migErr);
 		[mig, migErr] = await migrateDB();
 	}
 	//check if db filled, already atleast once
