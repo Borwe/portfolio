@@ -4,8 +4,8 @@ import { Pool } from "pg";
 import { Api } from "../github/web";
 import { PullRequest } from "../github/models";
 
-const PASSWORD: string = process.env.PASSWORD == undefined ?
-	"password" : process.env.PASSWORD;
+const PASSWORD: string = process.env.POSTGRES_PASSWORD == undefined ?
+	"password" : process.env.POSTGRES_PASSWORD;
 const DBHOST: string = process.env.DBHOST == undefined ?
 	"localhost" : process.env.DBHOST;
 const DBUSER: string = process.env.DBUSER == undefined ?
