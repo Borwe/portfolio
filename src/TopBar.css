@@ -1,24 +1,3 @@
-@keyframes white2_animate {
-    0% {width: 1%}
-    100% {width: 90%}
-}
-
-@keyframes red_animate {
-    0% {width: 1%}
-    100% {width: 88.5%}
-}
-
-@keyframes white1_animate {
-    0% {width: 1%}
-    100% {width: 80%}
-}
-
-
-@keyframes black_animate {
-    0% {width: 1%}
-    100% {width: 78.5%}
-}
-
 #white2 {
     position: absolute;
     z-index: 95;
