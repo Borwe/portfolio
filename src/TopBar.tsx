@@ -134,45 +134,33 @@ const MenuToDisplay: FC<{
 	sections: Sections,
 	dispatcher: UseAppDispatchType
 }> = (props) => {
-	const buttonsRef = useRef<HTMLButtonElement>(null);
 	const divRef = useRef<HTMLDivElement>(null);
 	const [opacity, setOpacity] = useState(0);
 
 	useEffect(() => {
 		if (props.startShowingTopButtons) {
-			gsap.to(buttonsRef.current, {
-				opacity: 1,
-				duration: 1,
-				onCompleteParams: ["opacity"],
-				onUpdate: () => {
-					if(buttonsRef.current!==undefined){
-						try{
-							setOpacity(+buttonsRef.current!.style.opacity);
-						}catch(e){}
-					}
-				}
-			})
-
 			gsap.to(divRef.current, {
 				opacity: 1,
 				duration: 1,
 				onUpdate: () => {
-					if(divRef.current !==undefined){
-						try{
+					if (divRef.current !== undefined) {
+						try {
 							setOpacity(+divRef.current!.style.opacity);
-						}catch(e){}
+						} catch (e) { }
 					}
 				}
 			})
 		}
-	}, [buttonsRef, divRef, props.startShowingTopButtons]);
+	}, [divRef, props.startShowingTopButtons]);
 
 	if (props.showExpandMenu === false) {
-		return <IconButton
-			sx={{ opacity: opacity }}
-			ref={buttonsRef} onClick={() => props.setShowMenuDrawer(true)}>
-			<MenuIcon sx={{ color: 'white', zIngex: 99 }} />
-		</IconButton>
+		return <Box ref={divRef}>
+			<IconButton
+				sx={{ opacity: opacity }}
+				 onClick={() => props.setShowMenuDrawer(true)}>
+				<MenuIcon sx={{ color: 'white', zIngex: 99 }} />
+			</IconButton>
+		</Box>
 	} else {
 		const buttons = props.sections.sections.map((p, i) => {
 			return <Button key={i.toString()}
