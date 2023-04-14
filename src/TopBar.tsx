@@ -1,4 +1,4 @@
-import React, { useEffect, useState, FC, MouseEventHandler, Dispatch, SetStateAction, useRef } from 'react';
+import React, { useEffect, useState, FC, Dispatch, SetStateAction, useRef } from 'react';
 import { Toolbar, AppBar, Button, Typography, IconButton, Drawer } from "@mui/material";
 import { CloseRounded } from "@mui/icons-material";
 import MenuIcon from "@mui/icons-material/Menu";
@@ -56,7 +56,7 @@ const MenuDrawer: FC<MenuDrawerProps> = (props: MenuDrawerProps) => {
 						};
 						return <Button
 							onClick={() => onClickMenuButton(props.dispatcher, i)}
-							variant={i == props.sections.selected ? "contained" : "text"}
+							variant={i === props.sections.selected ? "contained" : "text"}
 							color="error" key={i.toString()} sx={style}>
 							<Typography variant="subtitle1" sx={{ zIndex: 99 }}
 								display="block" m={1} >{p}</Typography>
@@ -72,44 +72,53 @@ const MenuDrawer: FC<MenuDrawerProps> = (props: MenuDrawerProps) => {
 	);
 }
 
-const FlagBackground: FC = () => {
+const FlagBackground: FC<{
+	setStartShowingTopButtons: Dispatch<SetStateAction<boolean>>
+}> = (props) => {
 	const black = useRef(null);
 	const white1 = useRef(null);
 	const red = useRef(null);
 	const white2 = useRef(null);
 
-	useEffect(()=>{
-		let timeline = gsap.timeline({delay: 1});
+	//setup flag animations on topbar
+	useEffect(() => {
+		let timeline = gsap.timeline({ delay: -1 });
 		timeline.to(white2.current, {
 			width: "90%",
-			duration: 1.5,
+			ease: "power4",
+			duration: 1,
 		})
 
 		timeline.to(red.current, {
 			width: "88.5%",
+			ease: "power4",
 			duration: 1,
 		})
 
 		timeline.to(white1.current, {
 			width: "80%",
+			ease: "power4",
 			duration: 1,
 		})
 
 		timeline.to(black.current, {
 			width: "78.5%",
+			ease: "power4",
 			duration: 1,
+			onStart: () => props.setStartShowingTopButtons(true)
 		})
 	}, [black, white1, red, white2]);
+
 	return <Box width={"100%"} height={"100%"} sx={{
 		position: "absolute",
 		display: "box",
 		top: "0px",
 		left: "0px",
 	}}>
-		<Box id="black" ref={black}/>
-		<Box id="white1" ref={white1}/>
+		<Box id="black" ref={black} />
+		<Box id="white1" ref={white1} />
 		<Box id="red" ref={red} />
-		<Box id="white2" ref={white2}/>
+		<Box id="white2" ref={white2} />
 	</Box>
 }
 
@@ -118,21 +127,36 @@ const onClickMenuButton = (dispatcher: UseDispatchFunc, pos: number) => {
 	dispatcher(setSection(pos));
 }
 
-const MenuToDisplay = (props: {
+const MenuToDisplay: FC<{
+	startShowingTopButtons: boolean,
 	showExpandMenu: boolean,
 	setShowMenuDrawer: Dispatch<SetStateAction<boolean>>
 	sections: Sections,
 	dispatcher: UseAppDispatchType
-}) => {
-	if (props.showExpandMenu == false) {
-		return <IconButton onClick={() => props.setShowMenuDrawer(true)}>
+}> = (props) => {
+	const buttonsRef = useRef(null);
+
+	useEffect(() => {
+		if (props.startShowingTopButtons) {
+			gsap.to(buttonsRef.current, {
+				opacity: 1,
+				duration: 1,
+				onComplete: () => console.log("Now Visible")
+			})
+		}
+	}, [buttonsRef, props.startShowingTopButtons]);
+
+	if (props.showExpandMenu === false) {
+		return <IconButton
+			sx={{ opacity: 0 }}
+			ref={buttonsRef} onClick={() => props.setShowMenuDrawer(true)}>
 			<MenuIcon sx={{ color: 'white', zIngex: 99 }} />
 		</IconButton>
 	} else {
 		const buttons = props.sections.sections.map((p, i) => {
 			return <Button key={i.toString()}
 				onClick={() => onClickMenuButton(props.dispatcher, i)}
-				variant={i == props.sections.selected ? "contained" : "text"}
+				variant={i === props.sections.selected ? "contained" : "text"}
 				color="error"
 				sx={{
 					color: 'white',
@@ -142,7 +166,7 @@ const MenuToDisplay = (props: {
 					display="block" mr={1} ml={1}>{p}</Typography>
 			</Button>
 		});
-		return (<>{buttons}</>)
+		return (<Box ref={buttonsRef} sx={{ opacity: 0 }}>{buttons}</Box>)
 	}
 }
 
@@ -151,8 +175,11 @@ const TopBar: React.FC = () => {
 	const sections = useAppSelector(state => state.sections);
 	const dispatcher = useAppDispatch();
 
-	let [showExpandMenu, setShowExpandMenu] = useState(true);
-	let [showMenuDrawer, setShowMenuDrawer] = useState(false);
+	const [showExpandMenu, setShowExpandMenu] = useState(true);
+	const [showMenuDrawer, setShowMenuDrawer] = useState(false);
+
+	//used for showing the top bar button at the top in animation
+	const [startShowingTopButtons, setStartShowingTopButtons] = useState(false);
 
 	useEffect(() => {
 		if (windowInfo.width < 880) {
@@ -162,16 +189,15 @@ const TopBar: React.FC = () => {
 		}
 	});
 
-
-
-
 	return (
 		<>
 			<AppBar sx={{ position: "sticky", top: 0, left: 0 }}>
 				<Toolbar sx={{ backgroundColor: "green" }}>
-					<FlagBackground />
+					<FlagBackground
+						setStartShowingTopButtons={setStartShowingTopButtons} />
 					<Box sx={{ zIndex: 99 }}>
 						<MenuToDisplay showExpandMenu={showExpandMenu}
+							startShowingTopButtons={startShowingTopButtons}
 							setShowMenuDrawer={setShowMenuDrawer} sections={sections}
 							dispatcher={dispatcher}
 						/>
