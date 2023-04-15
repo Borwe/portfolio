@@ -9,19 +9,14 @@ import { Sections, setSection } from './redux/sectionSlice';
 import gsap from "gsap";
 
 
-type UseDispatchFunc = ReturnType<typeof useAppDispatch>;
-
 type MenuDrawerProps = {
 	show: boolean,
 	showMenuAction: Dispatch<SetStateAction<boolean>>,
 	sections: Sections,
-	dispatcher: UseDispatchFunc,
+	dispatcher: UseAppDispatchType,
 }
 
 const MenuDrawer: FC<MenuDrawerProps> = (props: MenuDrawerProps) => {
-	const handleCloseButton = () => {
-		props.showMenuAction(false);
-	}
 	return (
 		<Drawer anchor="left" open={props.show}
 			PaperProps={{
@@ -30,21 +25,17 @@ const MenuDrawer: FC<MenuDrawerProps> = (props: MenuDrawerProps) => {
 			}}
 			onClose={(event, reason) => { props.showMenuAction(false) }}>
 
-			<Box sx={{ zIndex: 99, position: "absolute", right: 0, top: 0 }}>
+			<Box id="menu_drawer_close_button" >
 				<IconButton sx={{
 					color: "white", backgroundColor: "#222222",
 					marginRight: "10px", marginTop: "10px"
 				}} size="small"
-					onClick={handleCloseButton}>
+					onClick={() => props.showMenuAction(false)}>
 					<CloseRounded fontSize="large" />
 				</IconButton>
 			</Box>
 
-			<Box sx={{
-				zIndex: 100, width: "50%",
-				marginRight: "2px", marginLeft: "auto",
-				marginTop: 10
-			}}>
+			<Box id="menu_drawer_buttons">
 
 				{
 					props.sections.sections.map((p, i) => {
@@ -123,7 +114,7 @@ const FlagBackground: FC<{
 }
 
 
-const onClickMenuButton = (dispatcher: UseDispatchFunc, pos: number) => {
+const onClickMenuButton = (dispatcher: UseAppDispatchType, pos: number) => {
 	dispatcher(setSection(pos));
 }
 
@@ -154,10 +145,9 @@ const MenuToDisplay: FC<{
 	}, [divRef, props.startShowingTopButtons]);
 
 	if (props.showExpandMenu === false) {
-		return <Box ref={divRef}>
+		return <Box sx={{ opacity: opacity }} ref={divRef}>
 			<IconButton
-				sx={{ opacity: opacity }}
-				 onClick={() => props.setShowMenuDrawer(true)}>
+				onClick={() => props.setShowMenuDrawer(true)}>
 				<MenuIcon sx={{ color: 'white', zIngex: 99 }} />
 			</IconButton>
 		</Box>

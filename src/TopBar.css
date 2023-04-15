@@ -76,6 +76,7 @@
     100% {height: 77%}
 }
 
+
 #white2_drawer {
     position: absolute;
     z-index: 95;
@@ -130,4 +131,33 @@
     animation-duration: 1s;
     animation-fill-mode: forwards;
     animation-delay: 0.6s;
+}
+
+@keyframes menu_drawer_anim {
+	100% {opacity: 1};
+}
+
+#menu_drawer_close_button {
+	z-index: 99;
+	position: absolute;
+	right: 0;
+	top: 0;
+	opacity: 0;
+	animation-name: menu_drawer_anim;
+	animation-duration: 2s;
+	animation-fill-mode: forwards;
+	animation-delay: 0.6s;
+}
+
+#menu_drawer_buttons {
+	z-index: 100;
+	width: 50%;
+	margin-right: 2px;
+	margin-left: auto;
+	margin-top: 100px;
+	opacity: 0;
+	animation-name: menu_drawer_anim;
+	animation-duration: 2s;
+	animation-fill-mode: forwards;
+	animation-delay: 0.6s;
 }
