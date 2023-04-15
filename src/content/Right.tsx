@@ -1,21 +1,10 @@
 import { Box } from "@mui/material";
-import { FC, MouseEvent, useEffect, useRef } from "react";
+import { FC, useEffect, useRef } from "react";
 import "./Right.css";
 import right_img from "../imgs/look_left_up_black_border.png";
 import right_black_red from "../imgs/look_left_up_red.png";
 import right_black_green from "../imgs/look_left_up_green.png";
 import gsap from "gsap";
-
-type Position = {
-	x: number,
-	y: number
-}
-
-type ImagePositions = {
-	black: Position,
-	red: Position,
-	green: Position
-};
 
 const Right: FC = () => {
 	const top = useRef(null);
