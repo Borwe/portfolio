@@ -1,13 +1,13 @@
 import { FC } from "react";
-import { Box } from "@mui/material";
 import Right from "./content/Right";
-import About from "./content/About";
 import Left from "./content/Left";
+import { Box } from "@mui/material";
+import "./Content.css";
 
 const Content: FC = ()=>{
   return (<>
-    <Right/>
-    <Left/>
+    <Box id="right"><Right/></Box>
+    <Box id="left"><Left /></Box>
     </>
   );
 } 

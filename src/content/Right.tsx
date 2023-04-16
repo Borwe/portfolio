@@ -34,7 +34,7 @@ const Right: FC = () => {
 		});
 	}, [top,green, red]);
 
-	return <Box id="right" >
+	return <>
 		<Box ref={top} id="right_img_top" >
 			<img src={right_img} height="75%" alt="My image" />
 		</Box>
@@ -44,7 +44,7 @@ const Right: FC = () => {
 		<Box ref={green} id="right_img_green">
 			<img src={right_black_green} height="75%" alt="My image" />
 		</Box>
-	</Box>
+	</>
 }
 
 export default Right;
