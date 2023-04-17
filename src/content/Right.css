@@ -1,22 +1,29 @@
 #right_img_top {
-	height: 100%;
-	bottom: -13%;
+	display: block;
+	margin-right: auto;
+	margin-left: auto;
+	height: 85%;
+	bottom: 30px;
 	position: absolute;
 	z-index: 99;
 }
 
 #right_img_red_mid {
-	height: 100%;
-	bottom: -13%;
+	display: block;
+	margin-right: auto;
+	margin-left: auto;
+	height: 85%;
+	bottom: 30px;
 	position: absolute;
 	z-index: 98;
-	left: 5px;
 }
 
 #right_img_green {
-	height: 100%;
-	bottom: -13%;
+	display: block;
+	margin-right: auto;
+	margin-left: auto;
+	height: 85%;
+	bottom: 30px;
 	position: absolute;
 	z-index: 97;
-	left: 10px;
 }

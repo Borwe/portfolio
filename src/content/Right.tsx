@@ -1,48 +1,63 @@
 import { Box } from "@mui/material";
-import { FC, useEffect, useRef } from "react";
+import { FC, MutableRefObject, useEffect, useRef, useState } from "react";
 import "./Right.css";
 import right_img from "../imgs/look_left_up_black_border.png";
 import right_black_red from "../imgs/look_left_up_red.png";
 import right_black_green from "../imgs/look_left_up_green.png";
 import gsap from "gsap";
 
-const Right: FC = () => {
-	const top = useRef(null);
-	const red = useRef(null);
-	const green = useRef(null);
+type ElementRef = MutableRefObject<HTMLImageElement>;
+type Tween = gsap.core.Tween;
 
-	useEffect(()=>{
-		gsap.to(top.current, {
-			bottom: "5%",
-			duration: 1,
+function setupGsapForRightLeftSplit(top: ElementRef,
+	red: ElementRef, green: ElementRef, isHalf: boolean) {
+	const rightPos = (isHalf ? 0 : window.innerWidth - top.current.clientWidth );
+	console.log("RIGHT POS:", rightPos);
+	return [
+		gsap.fromTo(top.current, { right: 0 }, {
+			bottom: "20%",
+			duration: 4,
 			repeat: -1,
+			right: rightPos,
 			yoyo: true
-		})
-		gsap.to(red.current, {
-			bottom: "5%",
+		}),
+		gsap.fromTo(red.current, { right: 0 }, {
+			bottom: "20%",
 			repeat: -1,
-			duration: 1,
-			delay: 0.1,
+			duration: 4,
+			delay: 0.5,
+			right: rightPos,
 			yoyo: true
-		});
-		gsap.to(green.current, {
-			bottom: "5%",
+		}),
+		gsap.fromTo(green.current, { right: 0, }, {
+			bottom: "20%",
 			repeat: -1,
-			duration: 1,
-			delay: 0.2,
+			duration: 4,
+			delay: 1,
+			right: rightPos,
 			yoyo: true
-		});
-	}, [top,green, red]);
+		})];
+}
+
+const Right: FC<{ isHalf: boolean }> = (props) => {
+	const top = useRef(HTMLImageElement.prototype);
+	const red = useRef(HTMLImageElement.prototype);
+	const green = useRef(HTMLImageElement.prototype);
+
+	const [anims, setAnims] = useState(new Array<Tween>());
+
+	useEffect(() => {
+		anims.forEach(anim => anim.kill());
+		setAnims(setupGsapForRightLeftSplit(top, red, green, props.isHalf));
+	}, [props.isHalf, window.innerWidth]);
 
 	return <>
-		<Box ref={top} id="right_img_top" >
-			<img src={right_img} height="75%" alt="My image" />
-		</Box>
-		<Box ref={red} id="right_img_red_mid">
-			<img src={right_black_red} height="75%" alt="My image" />
-		</Box>
-		<Box ref={green} id="right_img_green">
-			<img src={right_black_green} height="75%" alt="My image" />
+		<Box sx={{ width: "100%" }}>
+			<img ref={top} id="right_img_top" src={right_img} alt="My image" />
+			<img ref={red} id="right_img_red_mid"
+				src={right_black_red} alt="My image" />
+			<img ref={green} id="right_img_green"
+				src={right_black_green} alt="My image" />
 		</Box>
 	</>
 }
