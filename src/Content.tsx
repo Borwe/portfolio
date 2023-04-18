@@ -2,7 +2,6 @@ import { FC, useEffect, useState } from "react";
 import Right from "./content/Right";
 import Left from "./content/Left";
 import { Box } from "@mui/material";
-import "./Content.css";
 import { useAppSelector } from "./redux/hooks";
 import { SxProps } from "@mui/system";
 
@@ -35,20 +34,23 @@ function createLocationSx(side: Side): SxProps {
   } else {
     if (side == Side.Top) {
       return {
-        top: 50,
+        top: 55,
         backgroundColor: "black",
         position: "fixed",
-        height: "40%",
+        height: "25%",
         width: "100%",
         zIndex: 99
       }
     } else {
       //meaning we are in bottom, creating it's css
+      //
+      console.log("WINDOW_POS:",(window.innerHeight*0.25)+50);
       return {
-        zIndex: 99,
+        zIndex: 90,
         wordWrap: "break-word",
         width: window.innerWidth,
-        top: (window.innerHeight)*0.4
+        marginTop: (window.innerHeight*0.23)+"px",
+        marginBottom: "30px"
       }
     }
   }
