@@ -7,10 +7,11 @@ import OpenSource from "./OpenSource";
 import Projects from "./Projects";
 import gsap from "gsap";
 import ScrollTrigger from "gsap/ScrollTrigger";
+import { RightSideDiv } from "../Content";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const Left: FC = () => {
+const Left: FC<{rightSide: RightSideDiv}> = (props) => {
 	let background = useRef(HTMLDivElement);
 	let about = useRef(null);
 	let credentials = useRef(null);
@@ -19,69 +20,51 @@ const Left: FC = () => {
 	let links = useRef(null);
 
 	useEffect(()=>{
-		gsap.to(background.current,  {
+		gsap.to(props.rightSide.current!,  {
 			scrollTrigger: {
 				trigger: about.current,
-				start: "bottom 50%",
-				scrub: 1,
-				pin: true,
+				onEnter: ()=> props.rightSide.current!.style.background="black",
+				onEnterBack: ()=> props.rightSide.current!.style.background="black",
+				scrub: true,
 				pinSpacing: false,
 			},
 		})
-		gsap.to(background.current,  {
+		gsap.to(props.rightSide.current!,  {
 			scrollTrigger: {
 				trigger: credentials.current,
-				start: "bottom 50%",
-				scrub: 1,
-				pin: true,
+				onEnter: ()=> props.rightSide.current!.style.background="white",
+				onEnterBack: ()=> props.rightSide.current!.style.background="white",
+				scrub: true,
 				pinSpacing: false,
 			},
 		})
-		gsap.to(background.current,  {
+		gsap.to(props.rightSide.current!,  {
 			scrollTrigger: {
 				trigger: projects.current,
-				start: "bottom 50%",
-				scrub: 1,
-				pin: true,
+				onEnter: ()=> props.rightSide.current!.style.background="red",
+				onEnterBack: ()=> props.rightSide.current!.style.background="red",
+				scrub: true,
 				pinSpacing: false,
 			},
 		})
-		gsap.to(background.current,  {
+		gsap.to(props.rightSide.current!,  {
 			scrollTrigger: {
 				trigger: opensource.current,
-				start: "bottom 50%",
-				scrub: 1,
-				pin: true,
+				onEnter: ()=> props.rightSide.current!.style.background="white",
+				onEnterBack: ()=> props.rightSide.current!.style.background="white",
+				scrub: true,
 				pinSpacing: false,
 			},
 		})
-		gsap.to(background.current,  {
+		gsap.to(props.rightSide.current!,  {
 			scrollTrigger: {
 				trigger: links.current,
-				start: "bottom 50%",
-				scrub: 1,
-				pin: true,
+				onEnter: ()=> props.rightSide.current!.style.background="green",
+				onEnterBack: ()=> props.rightSide.current!.style.background="green",
+				scrub: true,
 				pinSpacing: false,
 			},
 		})
-		//ScrollTrigger.create({
-		//	trigger: projects.current,
-		//	start: "bottom 70%",
-		//	pin: true,
-		//	pinSpacing: false
-		//});
-		//ScrollTrigger.create({
-		//	trigger: opensource.current,
-		//	start: "bottom 70%",
-		//	pin: true,
-		//	pinSpacing: false
-		//});
-		//ScrollTrigger.create({
-		//	trigger: links.current,
-		//	start: "bottom 70%",
-		//	pin: true,
-		//	pinSpacing: false
-		//});
 	}, [about, credentials, projects, opensource, links, background]);
 	return (<Box ref={background}>
 		<Box ref={about} sx={{marginBottom: "30px"}}><About /></Box>

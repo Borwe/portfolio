@@ -1,9 +1,11 @@
-import { FC, useEffect, useState } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 import Right from "./content/Right";
 import Left from "./content/Left";
 import { Box } from "@mui/material";
 import { useAppSelector } from "./redux/hooks";
 import { SxProps } from "@mui/system";
+
+export type RightSideDiv = ReturnType<typeof useRef<HTMLDivElement>>;
 
 enum Side {
   Left, Right, Top, Bottom
@@ -62,6 +64,7 @@ const Content: FC = () => {
   let leftSx  = createLocationSx(Side.Left);
   // state if width is half or not
   const [isHalf, setIsHalf] = useState(true);
+  const rightSideForBackgroundAnim = useRef(HTMLDivElement.prototype);
 
   //Render with different CSS depending on window size
   if (!isHalf) {
@@ -78,8 +81,8 @@ const Content: FC = () => {
   }, [windowInfo]);
 
   return (<>
-    <Box sx={rightSx} ><Right isHalf={isHalf} /></Box>
-    <Box sx={leftSx} ><Left /></Box>
+    <Box sx={rightSx} ref={rightSideForBackgroundAnim} ><Right isHalf={isHalf} /></Box>
+    <Box sx={leftSx} ><Left rightSide={rightSideForBackgroundAnim} /></Box>
   </>
   );
 }

@@ -5,6 +5,7 @@ import right_img from "../imgs/look_left_up_black_border.png";
 import right_black_red from "../imgs/look_left_up_red.png";
 import right_black_green from "../imgs/look_left_up_green.png";
 import gsap from "gsap";
+import { RightSideDiv } from "../Content";
 
 type ElementRef = MutableRefObject<HTMLImageElement>;
 type Tween = gsap.core.Tween;
