@@ -16,16 +16,17 @@ function createLocationSx(side: Side): SxProps {
   // If screen greater than 1000px wide use this
   if (side === Side.Left || side === Side.Right) {
     let result: SxProps = {
-      width: "50%",
       top: 50,
       zIndex: 99,
     };
 
     if (side === Side.Left) {
+      result.width = "60%"
       result.marginBottom = "30px";
       result.left = 0;
       result.wordWrap = "break-word";
     } else if (side === Side.Right) {
+      result.width = "40%"
       result.backgroundColor = "black";
       result.height = "100%";
       result.position = "fixed";
