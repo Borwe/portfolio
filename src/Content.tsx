@@ -34,7 +34,7 @@ function createLocationSx(side: Side): SxProps {
 
     return result;
   } else {
-    if (side == Side.Top) {
+    if (side === Side.Top) {
       return {
         top: 55,
         backgroundColor: "black",
