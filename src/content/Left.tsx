@@ -67,8 +67,8 @@ const Left: FC<{rightSide: RightSideDiv}> = (props) => {
 		})
 	}, [about, credentials, projects, opensource, links, background]);
 	return (<Box ref={background}>
-		<Box ref={about} sx={{marginBottom: "30px"}}><About /></Box>
-		<Box ref={credentials} sx={{marginBottom: "30px"}} ><Credentials /></Box>
+		<Box ref={about} ><About /></Box>
+		<Box ref={credentials} ><Credentials /></Box>
 		<Box ref={projects} ><Projects /></Box>
 		<Box ref={opensource} ><OpenSource /></Box>
 		<Box ref={links} ><Links /></Box>

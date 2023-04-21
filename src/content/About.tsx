@@ -25,10 +25,8 @@ const About: FC = ()=> {
 
 		if(windowInfo.height > mainDiv.current.clientHeight && height!=undefined){
 			setHeight(windowInfo.height );
-			console.log("window height:", windowInfo.height);
 		}else{
 			setHeight(mainDiv.current.scrollHeight);
-			console.log("undefined!!!")
 		}
 	},[mainDiv, windowInfo, height]);
 

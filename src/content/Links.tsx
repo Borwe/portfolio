@@ -1,12 +1,33 @@
-import { FC } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 import { Box, Typography } from "@mui/material";
+import { useAppSelector } from "../redux/hooks";
 
 const Links: FC = () =>{
-		return (<Box sx={{backgroundColor: "green"}}>
-				<Typography variant="h1">
-				YEAH!! THIS THAT LINKS SECTION HOMIE, WE ALL ABOUT LINKS!!!!
-				</Typography>
-				</Box>)
+	const windowInfo = useAppSelector(state =>  state.windows);
+	const mainDiv = useRef(HTMLDivElement.prototype);
+	const [height, setHeight] = useState<number | undefined>(undefined);
+
+	useEffect(()=>{
+
+		if(windowInfo.height > mainDiv.current.clientHeight){
+			setHeight(windowInfo.height );
+			console.log("white:", windowInfo.height);
+		}else{
+			setHeight(mainDiv.current.scrollHeight);
+			console.log("white normal!!!")
+		}
+	},[mainDiv, windowInfo, height]);
+
+	return (<Box ref={mainDiv} sx={{
+			backgroundColor: "green",
+			height: height
+		}}>
+		<Typography variant="h2" sx={{
+			fontFamily: '"Press Start 2P"'
+		}}>
+		Links:
+		</Typography>
+		</Box>)
 }
 
 export default Links;
