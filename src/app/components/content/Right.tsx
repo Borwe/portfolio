@@ -1,11 +1,11 @@
 import { Box } from "@mui/material";
 import { FC, MutableRefObject, useEffect, useRef, useState } from "react";
 import "./Right.css";
-import right_img from "../imgs/look_left_up_black_border.png";
-import right_black_red from "../imgs/look_left_up_red.png";
-import right_black_green from "../imgs/look_left_up_green.png";
 import gsap from "gsap";
-import { RightSideDiv } from "../Content";
+
+const right_img = "/imgs/look_left_up_black_border.png";
+const right_black_red = "/imgs/look_left_up_red.png";
+const right_black_green = "/imgs/look_left_up_green.png";
 
 type ElementRef = MutableRefObject<HTMLImageElement>;
 type Tween = gsap.core.Tween;

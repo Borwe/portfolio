@@ -1,3 +1,5 @@
+'use client'
+
 import { FC, useEffect, useRef, useState } from "react";
 import Right from "./content/Right";
 import Left from "./content/Left";
