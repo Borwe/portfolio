@@ -11,15 +11,12 @@ type ElementRef = MutableRefObject<HTMLImageElement>;
 type Tween = gsap.core.Tween;
 
 function setupGsapForRightLeftSplit(top: ElementRef,
-	red: ElementRef, green: ElementRef, isHalf: boolean) {
-	const rightPos = (isHalf ? 0 : window.innerWidth - top.current.clientWidth );
-	console.log("RIGHT POS:", rightPos);
+	red: ElementRef, green: ElementRef) {
 	return [
 		gsap.fromTo(top.current, { right: 0 }, {
 			bottom: "20%",
 			duration: 4,
 			repeat: -1,
-			right: rightPos,
 			yoyo: true
 		}),
 		gsap.fromTo(red.current, { right: 0 }, {
@@ -27,7 +24,6 @@ function setupGsapForRightLeftSplit(top: ElementRef,
 			repeat: -1,
 			duration: 4,
 			delay: 0.5,
-			right: rightPos,
 			yoyo: true
 		}),
 		gsap.fromTo(green.current, { right: 0, }, {
@@ -35,7 +31,6 @@ function setupGsapForRightLeftSplit(top: ElementRef,
 			repeat: -1,
 			duration: 4,
 			delay: 1,
-			right: rightPos,
 			yoyo: true
 		})];
 }
@@ -49,7 +44,7 @@ const Right: FC<{ isHalf: boolean }> = (props) => {
 
 	useEffect(() => {
 		anims.forEach(anim => anim.kill());
-		setAnims(setupGsapForRightLeftSplit(top, red, green, props.isHalf));
+		setAnims(setupGsapForRightLeftSplit(top, red, green));
 	}, [props.isHalf, window.innerWidth]);
 
 	return <>
