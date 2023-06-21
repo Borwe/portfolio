@@ -29,7 +29,7 @@ function createLocationSx(side: Side): SxProps {
       result.wordWrap = "break-word";
     } else if (side === Side.Right) {
       result.width = "40%"
-      result.backgroundColor = "black";
+      result.backgroundColor = "green";
       result.height = "100%";
       result.position = "fixed";
       result.right = 0;
@@ -48,13 +48,12 @@ function createLocationSx(side: Side): SxProps {
       }
     } else {
       //meaning we are in bottom, creating it's css
-      //
       console.log("WINDOW_POS:",(window.innerHeight*0.25)+50);
       return {
         zIndex: 90,
         wordWrap: "break-word",
         width: window.innerWidth,
-        marginTop: (window.innerHeight*0.23)+"px",
+        marginTop: (window.innerHeight*0.245)+"px",
         marginBottom: "30px"
       }
     }
