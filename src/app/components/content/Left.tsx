@@ -19,53 +19,6 @@ const Left: FC<{rightSide: RightSideDiv}> = (props) => {
 	let opensource = useRef(null);
 	let links = useRef(null);
 
-	useEffect(()=>{
-		gsap.to(props.rightSide.current!,  {
-			scrollTrigger: {
-				trigger: about.current,
-				onEnter: ()=> props.rightSide.current!.style.background="black",
-				onEnterBack: ()=> props.rightSide.current!.style.background="black",
-				scrub: true,
-				pinSpacing: false,
-			},
-		})
-		gsap.to(props.rightSide.current!,  {
-			scrollTrigger: {
-				trigger: credentials.current,
-				onEnter: ()=> props.rightSide.current!.style.background="white",
-				onEnterBack: ()=> props.rightSide.current!.style.background="white",
-				scrub: true,
-				pinSpacing: false,
-			},
-		})
-		gsap.to(props.rightSide.current!,  {
-			scrollTrigger: {
-				trigger: projects.current,
-				onEnter: ()=> props.rightSide.current!.style.background="red",
-				onEnterBack: ()=> props.rightSide.current!.style.background="red",
-				scrub: true,
-				pinSpacing: false,
-			},
-		})
-		gsap.to(props.rightSide.current!,  {
-			scrollTrigger: {
-				trigger: opensource.current,
-				onEnter: ()=> props.rightSide.current!.style.background="white",
-				onEnterBack: ()=> props.rightSide.current!.style.background="white",
-				scrub: true,
-				pinSpacing: false,
-			},
-		})
-		gsap.to(props.rightSide.current!,  {
-			scrollTrigger: {
-				trigger: links.current,
-				onEnter: ()=> props.rightSide.current!.style.background="green",
-				onEnterBack: ()=> props.rightSide.current!.style.background="green",
-				scrub: true,
-				pinSpacing: false,
-			},
-		})
-	}, [about, credentials, projects, opensource, links, background]);
 	return (<Box ref={background}>
 		<Box ref={about} ><About /></Box>
 		<Box ref={credentials} ><Credentials /></Box>

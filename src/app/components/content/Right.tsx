@@ -35,6 +35,24 @@ function setupGsapForRightLeftSplit(top: ElementRef,
 		})];
 }
 
+const RightFlag: FC = ()=>{
+	const black = useRef(HTMLDivElement.prototype);
+	const white1 = useRef(HTMLDivElement.prototype);
+	const red = useRef(HTMLDivElement.prototype);
+	const white2 = useRef(HTMLDivElement.prototype);
+
+	// TODO animate flags to down 
+	// TODO Handle opening the divs like a card scrolling 
+	// according to section
+
+	return (<>
+		<Box typeof="div" ref={black} />
+		<Box typeof="div" ref={white1} />
+		<Box typeof="div" ref={red} />
+		<Box typeof="div" ref={white2} />
+		</>)
+}
+
 const Right: FC<{ isHalf: boolean }> = (props) => {
 	const top = useRef(HTMLImageElement.prototype);
 	const red = useRef(HTMLImageElement.prototype);
@@ -48,7 +66,10 @@ const Right: FC<{ isHalf: boolean }> = (props) => {
 	}, [props.isHalf, window.innerWidth]);
 
 	return <>
-		<Box sx={{ width: "100%" }}>
+		<Box sx={{ zIndex: 99}}>
+			<RightFlag/>
+		</Box>
+		<Box sx={{ width: "100%", zIndex: 100 }}>
 			<img ref={top} id="right_img_top" src={right_img} alt="My image" />
 			<img ref={red} id="right_img_red_mid"
 				src={right_black_red} alt="My image" />
