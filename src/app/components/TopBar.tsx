@@ -102,7 +102,7 @@ const FlagBackground: FC<{
 
 	return <Box width={"100%"} height={"100%"} sx={{
 		position: "absolute",
-		display: "box",
+		display: "block",
 		top: "0px",
 		left: "0px",
 	}}>

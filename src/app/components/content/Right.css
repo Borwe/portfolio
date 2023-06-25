@@ -1,3 +1,23 @@
+#black_flag {
+	position: absolute;
+	z-index: 2;
+	display: block;
+	top: 0px;
+	background-Color: black;
+	height: 1%;
+	width: 100%;
+}
+
+#white1_flag {
+	position: absolute;
+	z-index: 1;
+	top: 0px;
+	display: block;
+	background-Color: white;
+	height: 1%;
+	width: 100%;
+}
+
 #right_img_top {
 	display: block;
 	margin-right: auto;
@@ -5,7 +25,7 @@
 	height: 85%;
 	bottom: 30px;
 	position: absolute;
-	z-index: 99;
+	z-index: 111;
 }
 
 #right_img_red_mid {
@@ -15,7 +35,7 @@
 	height: 85%;
 	bottom: 30px;
 	position: absolute;
-	z-index: 98;
+	z-index: 110;
 }
 
 #right_img_green {
@@ -25,5 +45,5 @@
 	height: 85%;
 	bottom: 30px;
 	position: absolute;
-	z-index: 97;
+	z-index: 109;
 }
