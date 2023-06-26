@@ -1,8 +1,10 @@
+'use client'
 import { Box, Typography } from "@mui/material";
 import { FC, useEffect, useRef, useState } from "react";
 import { useAppSelector } from "../redux/hooks";
 import gsap from "gsap";
 import TextPlugin from "gsap/TextPlugin";
+import { ReduceBoxRef } from "./Left";
 
 gsap.registerPlugin(TextPlugin);
 
@@ -13,25 +15,26 @@ const ME: Array<string> = [
 			"A Manchester United fun for life."
 ];
 
-const About: FC = ()=> {
+const About: FC<{reduceRef: ReduceBoxRef}> = (props)=> {
 	const windowInfo = useAppSelector(state =>  state.windows);
 	const mainDiv = useRef(HTMLDivElement.prototype);
 	const textAbout = useRef(null);
-	const [height, setHeight] = useState<number | undefined>(undefined);
 
 	const [textShow, setTextToShow] = useState(0);
 
 	useEffect(()=>{
-
-		if(windowInfo.height > mainDiv.current.clientHeight && height!=undefined){
-			setHeight(windowInfo.height );
+		props.reduceRef(mainDiv);
+		if(windowInfo.height > mainDiv.current.clientHeight){
+			console.log("ABOUT BIG")
+			mainDiv.current.style.height=windowInfo.height+"px";
 		}else{
-			setHeight(mainDiv.current.scrollHeight);
+			console.log("ABOUT SMALL")
 		}
-	},[mainDiv, windowInfo, height]);
 
-	// For animating text
+	},[mainDiv, windowInfo]);
+
 	useEffect(()=>{
+		// For animating text
 		gsap.to(textAbout.current, {
 			duration: 2,
 			text: {
@@ -48,11 +51,10 @@ const About: FC = ()=> {
 				},2000);
 			}
 		});
-	}, [textAbout, textShow]);
+	},[textAbout, textShow])
 
 	return (<Box component="div" ref={mainDiv} sx={{
 		backgroundColor: "black",
-		height: height
 	}}>
 		<Typography variant="h2" sx={{
 			color: "white",

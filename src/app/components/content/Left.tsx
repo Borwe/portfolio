@@ -1,5 +1,6 @@
+'use client'
 import { Box } from "@mui/material"
-import { FC, useEffect, useRef } from "react"
+import { Dispatch, FC, MutableRefObject, useEffect, useReducer, useRef, useState } from "react"
 import About from "./About";
 import Credentials from "./Credentials";
 import Links from "./Links";
@@ -7,24 +8,64 @@ import OpenSource from "./OpenSource";
 import Projects from "./Projects";
 import gsap from "gsap";
 import ScrollTrigger from "gsap/ScrollTrigger";
-import { RightSideDiv } from "../Content";
+import { RightSideFlagsElements } from "../Content";
+
 
 gsap.registerPlugin(ScrollTrigger);
 
-const Left: FC<{rightSide: RightSideDiv}> = (props) => {
-	let background = useRef(HTMLDivElement);
-	let about = useRef(null);
-	let credentials = useRef(null);
-	let projects = useRef(null);
-	let opensource = useRef(null);
-	let links = useRef(null);
+export type BoxRef = MutableRefObject<HTMLDivElement>;
+export type ReduceBoxRef = Dispatch<BoxRef>;
 
-	return (<Box ref={background}>
-		<Box ref={about} ><About /></Box>
-		<Box ref={credentials} ><Credentials /></Box>
-		<Box ref={projects} ><Projects /></Box>
-		<Box ref={opensource} ><OpenSource /></Box>
-		<Box ref={links} ><Links /></Box>
+const elementRefReducer =
+	(state: BoxRef | undefined, action: BoxRef | undefined) => action
+
+
+
+const Left: FC<RightSideFlagsElements> = (props) => {
+	let [about, setAbout] = 
+		useReducer(elementRefReducer,undefined);
+	let [credentials, setCredentials] = 
+		useReducer(elementRefReducer,undefined);
+	let [projects, setProjects] =
+		useReducer(elementRefReducer,undefined);
+	let [opensource, setOpensorce] =
+		useReducer(elementRefReducer,undefined);
+	let [links, setLinks] = 
+		useReducer(elementRefReducer,undefined);
+
+
+	useEffect(()=>{
+		let sectors = [about, credentials,
+			projects, opensource, links];
+		for(let i=0; i<sectors.length; ++i){
+			if(sectors[i]==undefined){
+				console.log("FUCKING!!!!!!!!!!!!!!!!!")
+				break;
+			}
+			console.log("Section:",i)
+			
+			gsap.to(sectors[i]!.current, {
+				scrollTrigger: {
+					trigger: sectors[i]!.current,
+					start: props.isHalf? "bottom 90%"
+						:"top "+(window.innerHeight*0.245)+"px",
+					pin: true,
+					pinSpacing: false,
+					markers: true,
+				},
+			})
+		}
+
+	},[ props.isHalf, props.white2, props.white1,
+		props.red, props.black, about,
+		credentials, projects,opensource,links])
+
+	return (<Box>
+		<Box><About reduceRef={setAbout} /></Box>
+		<Box><Credentials reduceRef={setCredentials}/></Box>
+		<Box><Projects reduceRef={setProjects}/></Box>
+		<Box><OpenSource reduceRef={setOpensorce}/></Box>
+		<Box><Links reduceRef={setLinks} /></Box>
 	</Box>)
 }
 

@@ -7,7 +7,16 @@ import { Box } from "@mui/material";
 import { useAppSelector } from "./redux/hooks";
 import { SxProps } from "@mui/system";
 
-export type RightSideDiv = ReturnType<typeof useRef<HTMLDivElement>>;
+export type RightSideFlagSection = 
+  ReturnType<typeof useRef<HTMLDivElement>>;
+
+export type RightSideFlagsElements = {
+	isHalf: boolean,
+	black: RightSideFlagSection,
+	white1: RightSideFlagSection,
+	red: RightSideFlagSection,
+	white2: RightSideFlagSection,
+}
 
 enum Side {
   Left, Right, Top, Bottom
@@ -66,7 +75,11 @@ const Content: FC = () => {
   let leftSx  = createLocationSx(Side.Left);
   // state if width is half or not
   const [isHalf, setIsHalf] = useState(true);
-  const rightSideForBackgroundAnim = useRef(HTMLDivElement.prototype);
+
+	const black = useRef(HTMLDivElement.prototype);
+	const white1 = useRef(HTMLDivElement.prototype);
+	const red = useRef(HTMLDivElement.prototype);
+	const white2 = useRef(HTMLDivElement.prototype);
 
   //Render with different CSS depending on window size
   if (!isHalf) {
@@ -83,8 +96,14 @@ const Content: FC = () => {
   }, [windowInfo]);
 
   return (<>
-    <Box sx={rightSx} ref={rightSideForBackgroundAnim} ><Right isHalf={isHalf} /></Box>
-    <Box sx={leftSx} ><Left rightSide={rightSideForBackgroundAnim} /></Box>
+    <Box sx={rightSx} >
+      <Right isHalf={isHalf} black={black} white1={white1}
+        red={red} white2={white2}/>
+    </Box>
+    <Box sx={leftSx} ><Left 
+        isHalf={isHalf} black={black} white1={white1}
+        red={red} white2={white2}
+    /></Box>
   </>
   );
 }

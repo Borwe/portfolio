@@ -1,6 +1,6 @@
 #black_flag {
 	position: absolute;
-	z-index: 2;
+	z-index: 8;
 	display: block;
 	top: 0px;
 	background-Color: black;
@@ -10,7 +10,27 @@
 
 #white1_flag {
 	position: absolute;
-	z-index: 1;
+	z-index: 7;
+	top: 0px;
+	display: block;
+	background-Color: white;
+	height: 1%;
+	width: 100%;
+}
+
+#red_flag {
+	position: absolute;
+	z-index: 6;
+	top: 0px;
+	display: block;
+	background-Color: red;
+	height: 1%;
+	width: 100%;
+}
+
+#white2_flag {
+	position: absolute;
+	z-index: 5;
 	top: 0px;
 	display: block;
 	background-Color: white;

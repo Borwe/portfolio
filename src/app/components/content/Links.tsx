@@ -1,26 +1,22 @@
 import { FC, useEffect, useRef, useState } from "react";
 import { Box, Typography } from "@mui/material";
 import { useAppSelector } from "../redux/hooks";
+import { ReduceBoxRef } from "./Left";
 
-const Links: FC = () =>{
+const Links: FC<{ reduceRef : ReduceBoxRef }> = (props) =>{
 	const windowInfo = useAppSelector(state =>  state.windows);
 	const mainDiv = useRef(HTMLDivElement.prototype);
-	const [height, setHeight] = useState<number | undefined>(undefined);
 
 	useEffect(()=>{
-
+		props.reduceRef(mainDiv);
 		if(windowInfo.height > mainDiv.current.clientHeight){
-			setHeight(windowInfo.height );
+			mainDiv.current.style.height=windowInfo.height+"px";
 			console.log("white:", windowInfo.height);
-		}else{
-			setHeight(mainDiv.current.scrollHeight);
-			console.log("white normal!!!")
 		}
-	},[mainDiv, windowInfo, height]);
+	},[mainDiv, windowInfo]);
 
 	return (<Box ref={mainDiv} sx={{
 			backgroundColor: "green",
-			height: height
 		}}>
 		<Typography variant="h2" sx={{
 			fontFamily: '"Press Start 2P"'
