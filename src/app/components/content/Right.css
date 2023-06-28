@@ -1,20 +1,18 @@
-#black_flag {
+#green_flag {
 	position: absolute;
 	z-index: 8;
 	display: block;
 	top: 0px;
-	background-Color: black;
-	height: 1%;
+	background-Color: green;
 	width: 100%;
 }
 
 #white1_flag {
 	position: absolute;
-	z-index: 7;
+	z-index: 5;
 	top: 0px;
 	display: block;
 	background-Color: white;
-	height: 1%;
 	width: 100%;
 }
 
@@ -24,17 +22,15 @@
 	top: 0px;
 	display: block;
 	background-Color: red;
-	height: 1%;
 	width: 100%;
 }
 
 #white2_flag {
 	position: absolute;
-	z-index: 5;
+	z-index: 7;
 	top: 0px;
 	display: block;
 	background-Color: white;
-	height: 1%;
 	width: 100%;
 }
 

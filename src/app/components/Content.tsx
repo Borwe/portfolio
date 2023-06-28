@@ -1,8 +1,8 @@
 'use client'
 
-import { FC, useEffect, useRef, useState } from "react";
+import { Dispatch, FC, useEffect, useReducer, useRef, useState } from "react";
 import Right from "./content/Right";
-import Left from "./content/Left";
+import Left, { BoxRef } from "./content/Left";
 import { Box } from "@mui/material";
 import { useAppSelector } from "./redux/hooks";
 import { SxProps } from "@mui/system";
@@ -10,12 +10,30 @@ import { SxProps } from "@mui/system";
 export type RightSideFlagSection = 
   ReturnType<typeof useRef<HTMLDivElement>>;
 
+
+const elementRefReducerFlags =
+  (_: BoxRef | undefined, action: BoxRef | undefined) =>{
+    console.log("flag setting...");
+    return action
+  } 
+
 export type RightSideFlagsElements = {
 	isHalf: boolean,
-	black: RightSideFlagSection,
 	white1: RightSideFlagSection,
 	red: RightSideFlagSection,
 	white2: RightSideFlagSection,
+	green: RightSideFlagSection,
+}
+
+export type BoxRefAndSetter = 
+  [BoxRef | undefined, Dispatch<BoxRef | undefined>];
+
+export type RightSideFlagSetters = {
+	isHalf: boolean,
+	white1: BoxRefAndSetter,
+	red: BoxRefAndSetter,
+	white2: BoxRefAndSetter,
+	green: BoxRefAndSetter,
 }
 
 enum Side {
@@ -38,7 +56,7 @@ function createLocationSx(side: Side): SxProps {
       result.wordWrap = "break-word";
     } else if (side === Side.Right) {
       result.width = "40%"
-      result.backgroundColor = "green";
+      result.backgroundColor = "black";
       result.height = "100%";
       result.position = "fixed";
       result.right = 0;
@@ -76,10 +94,14 @@ const Content: FC = () => {
   // state if width is half or not
   const [isHalf, setIsHalf] = useState(true);
 
-	const black = useRef(HTMLDivElement.prototype);
-	const white1 = useRef(HTMLDivElement.prototype);
-	const red = useRef(HTMLDivElement.prototype);
-	const white2 = useRef(HTMLDivElement.prototype);
+  let green: BoxRefAndSetter = 
+    useReducer(elementRefReducerFlags, undefined);
+  let white1: BoxRefAndSetter = 
+    useReducer(elementRefReducerFlags, undefined);
+  let red: BoxRefAndSetter =
+    useReducer(elementRefReducerFlags, undefined);
+  let white2: BoxRefAndSetter = 
+    useReducer(elementRefReducerFlags, undefined);
 
   //Render with different CSS depending on window size
   if (!isHalf) {
@@ -97,12 +119,12 @@ const Content: FC = () => {
 
   return (<>
     <Box sx={rightSx} >
-      <Right isHalf={isHalf} black={black} white1={white1}
-        red={red} white2={white2}/>
+      <Right isHalf={isHalf} green={green}
+        white1={white1} red={red} white2={white2}/>
     </Box>
     <Box sx={leftSx} ><Left 
-        isHalf={isHalf} black={black} white1={white1}
-        red={red} white2={white2}
+        isHalf={isHalf} green={green[0]!} white1={white1[0]!}
+        red={red[0]!} white2={white2[0]!}
     /></Box>
   </>
   );

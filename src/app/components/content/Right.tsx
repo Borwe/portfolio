@@ -2,7 +2,7 @@ import { Box } from "@mui/material";
 import { FC, MutableRefObject, useEffect, useRef, useState } from "react";
 import "./Right.css";
 import gsap from "gsap";
-import { RightSideFlagSection, RightSideFlagsElements } from "../Content";
+import { RightSideFlagSetters } from "../Content";
 
 const right_img = "/imgs/look_left_up_black_border.png";
 const right_black_red = "/imgs/look_left_up_red.png";
@@ -36,33 +36,22 @@ function setupGsapForRightLeftSplit(top: ElementRef,
 		})];
 }
 
-const RightFlag: FC<RightSideFlagsElements> = (props)=>{
+const RightFlag: FC<RightSideFlagSetters> = (props)=>{
 	console.log("HALF: ",props.isHalf)
 
-	// TODO animate flags to down 
+	const green = useRef(HTMLDivElement.prototype);
+	const white1 = useRef(HTMLDivElement.prototype);
+	const red = useRef(HTMLDivElement.prototype);
+	const white2 = useRef(HTMLDivElement.prototype);
+
 	useEffect(()=>{
-		gsap.to(props.black.current!,{
-			height: "100%",
-			duration: 1,
-			delay: 4
-		})
-		gsap.to(props.white1.current!,{
-			height: "100%",
-			duration: 1,
-			delay: 3
-		})
-		gsap.to(props.red.current!,{
-			height: "100%",
-			duration: 1,
-			delay: 2
-		})
-		gsap.to(props.white2.current!,{
-			height: "100%",
-			duration: 1,
-			delay: 1
-		})
-	}, [props.black, props.white1, props.red, props.white2,
-		props.isHalf]);
+		//setup the flags ref by updating the nill value
+		props.white1[1](white1);
+		props.red[1](red);
+		props.white2[1](white2);
+		props.green[1](green);
+	}, [green, white1, white2, red, props.isHalf]);
+
 	// TODO Handle opening the divs like a card scrolling 
 	// according to section
 
@@ -72,14 +61,14 @@ const RightFlag: FC<RightSideFlagsElements> = (props)=>{
 				height: (props.isHalf ? window.innerHeight :
 				window.innerHeight * 0.25),
 				zIndex: 95}}>
-			<Box id="black_flag"  ref={props.black} />
-			<Box id="white1_flag" ref={props.white1} />
-			<Box id="red_flag" ref={props.red} />
-			<Box id="white2_flag" ref={props.white2} />
+			<Box id="green_flag"  ref={green} />
+			<Box id="white2_flag" ref={white2} />
+			<Box id="red_flag" ref={red} />
+			<Box id="white1_flag" ref={white1} />
 		</Box>)
 }
 
-const Right: FC<RightSideFlagsElements> = (props) => {
+const Right: FC<RightSideFlagSetters> = (props) => {
 	const top = useRef(HTMLImageElement.prototype);
 	const red = useRef(HTMLImageElement.prototype);
 	const green = useRef(HTMLImageElement.prototype);
@@ -92,7 +81,7 @@ const Right: FC<RightSideFlagsElements> = (props) => {
 	}, [props.isHalf, window.innerWidth]);
 
 	return <>
-		<RightFlag isHalf={props.isHalf} black={props.black}
+		<RightFlag isHalf={props.isHalf} green={props.green}
 			white1={props.white1} red={props.red} 
 			white2={props.white2}/>
 		<Box sx={{ width: "100%", zIndex: 111 }}>

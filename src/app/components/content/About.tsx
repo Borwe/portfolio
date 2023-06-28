@@ -27,8 +27,6 @@ const About: FC<{reduceRef: ReduceBoxRef}> = (props)=> {
 		if(windowInfo.height > mainDiv.current.clientHeight){
 			console.log("ABOUT BIG")
 			mainDiv.current.style.height=windowInfo.height+"px";
-		}else{
-			console.log("ABOUT SMALL")
 		}
 
 	},[mainDiv, windowInfo]);

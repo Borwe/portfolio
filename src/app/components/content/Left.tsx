@@ -16,8 +16,8 @@ gsap.registerPlugin(ScrollTrigger);
 export type BoxRef = MutableRefObject<HTMLDivElement>;
 export type ReduceBoxRef = Dispatch<BoxRef>;
 
-const elementRefReducer =
-	(state: BoxRef | undefined, action: BoxRef | undefined) => action
+export const elementRefReducer =
+	(_: BoxRef | undefined, action: BoxRef | undefined) => action
 
 
 
@@ -37,27 +37,49 @@ const Left: FC<RightSideFlagsElements> = (props) => {
 	useEffect(()=>{
 		let sectors = [about, credentials,
 			projects, opensource, links];
+
+		let flags = [ props.white1, props.red,
+			props.white2, props.green]
+
+
 		for(let i=0; i<sectors.length; ++i){
 			if(sectors[i]==undefined){
-				console.log("FUCKING!!!!!!!!!!!!!!!!!")
-				break;
+				return;
 			}
-			console.log("Section:",i)
 			
 			gsap.to(sectors[i]!.current, {
 				scrollTrigger: {
 					trigger: sectors[i]!.current,
 					start: props.isHalf? "bottom 90%"
-						:"top "+(window.innerHeight*0.245)+"px",
+						:"top "+(window.innerHeight*0.25)+"px",
 					pin: true,
 					pinSpacing: false,
+				},
+			})
+
+		}
+
+		for(let i=0; i<flags.length;++i){
+			if(flags[i]==undefined){
+				return;
+			}
+
+			console.log("FLAG:", i);
+
+			gsap.to(flags[i].current!, {
+				scrollTrigger: {
+					trigger: sectors[i+1]!.current,
+					start: "top "+(window.innerHeight-30)+"px",
+					end: "top 60px",
+					scrub: true,
 					markers: true,
 				},
+				height: "100%"
 			})
 		}
 
 	},[ props.isHalf, props.white2, props.white1,
-		props.red, props.black, about,
+		props.red, props.green, about,
 		credentials, projects,opensource,links])
 
 	return (<Box>
