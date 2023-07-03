@@ -34,32 +34,30 @@
 	width: 100%;
 }
 
-#right_img_top {
+#black_top_img {
 	display: block;
-	margin-right: auto;
-	margin-left: auto;
 	height: 85%;
-	bottom: 30px;
-	position: absolute;
-	z-index: 111;
+	position: fixed;
+	z-index: 1;
 }
 
-#right_img_red_mid {
+#red_top_img {
 	display: block;
-	margin-right: auto;
-	margin-left: auto;
 	height: 85%;
-	bottom: 30px;
-	position: absolute;
-	z-index: 110;
+	position: fixed;
+	z-index: 0;
 }
 
-#right_img_green {
+#green_top_img {
 	display: block;
-	margin-right: auto;
-	margin-left: auto;
 	height: 85%;
-	bottom: 30px;
+	position: fixed;
+	z-index: -1;
+}
+
+#black_img {
+	top: "5%";
+	display: block;
 	position: absolute;
-	z-index: 109;
+	bottom: 55px;
 }
