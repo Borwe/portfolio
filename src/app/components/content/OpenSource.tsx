@@ -33,7 +33,8 @@ async function getOpensourcePRs(): Promise<PR[]>{
 				continue;
 			}
 
-			return JSON.parse(""+resp.body)
+			const prs: Array<PR> = await resp.json()
+			return prs
 		}catch(_){
 			wait+=1000;
 			continue; //increment await by 1 second
@@ -58,7 +59,7 @@ const OpenSource: FC<{reduceRef: ReduceBoxRef}> = (props) =>{
 	},[mainDiv, windowInfo]);
 
 	useEffect(()=>{
-		getOpensourcePRs().then(prs=> console.log("PRS:", prs))
+		getOpensourcePRs().then(prs_r=> setPRs(prs_r))
 	},[])
 
 	return (<Box ref={mainDiv} sx={{
@@ -68,6 +69,9 @@ const OpenSource: FC<{reduceRef: ReduceBoxRef}> = (props) =>{
 		<Typography variant="h2" sx={{ fontFamily: '"Press Start 2P"' }} >
 		OpenSource:
 		</Typography>
+		{
+			prs.map(p=> <h1>{p.title}</h1>)
+		}
 		</Box>)
 }
 
