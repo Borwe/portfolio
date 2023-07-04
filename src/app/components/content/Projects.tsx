@@ -1,5 +1,5 @@
 import { FC, useEffect, useRef, useState } from "react";
-import { Box, Typography } from "@mui/material";
+import { Box, Divider, Typography } from "@mui/material";
 import { useAppSelector } from "../redux/hooks";
 import { ReduceBoxRef } from "./Left";
 
@@ -77,6 +77,8 @@ const CreateProject: FC<{proj: Project}> = (props)=>{
 				<span> {l}</span>)
 		}
 		</Typography><br/>
+
+		<Divider variant="middle" />
 
 		{
 			props.proj.info.map((inf)=> {

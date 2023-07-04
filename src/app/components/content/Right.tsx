@@ -62,6 +62,7 @@ function blackPlaceLocationCenter(isHalf: boolean,
 			+(width*0.6) +"px";
 		console.log("IMG WIDTH: ", imgWidth);
 	}else{
+		console.log("WE TOP DOWN BITCH!!!")
 	}
 }
 
