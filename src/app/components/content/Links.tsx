@@ -5,6 +5,7 @@ import { ReduceBoxRef } from "./Left";
 import TwitterIcon from "@mui/icons-material/Twitter";
 import Github from "@mui/icons-material/Github";
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
+import "./Links.css"
 
 type Link = {
 	image: typeof TwitterIcon ,
@@ -50,9 +51,7 @@ const Links: FC<{ reduceRef : ReduceBoxRef }> = (props) =>{
 		}
 	},[mainDiv, windowInfo]);
 
-	return (<Box ref={mainDiv} sx={{
-			backgroundColor: "green",
-		}}>
+	return (<div id="links_left" ref={mainDiv}>
 		<Typography variant="h2" sx={{
 			fontFamily: '"Press Start 2P"'
 		}}>
@@ -61,7 +60,7 @@ const Links: FC<{ reduceRef : ReduceBoxRef }> = (props) =>{
 		{
 			LINKS.map(l => <Link link={l} />)
 		}
-		</Box>)
+		</div>)
 }
 
 export default Links;

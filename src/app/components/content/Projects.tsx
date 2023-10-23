@@ -2,6 +2,7 @@ import { FC, useEffect, useRef, useState } from "react";
 import { Box, Divider, Typography } from "@mui/material";
 import { useAppSelector } from "../redux/hooks";
 import { ReduceBoxRef } from "./Left";
+import "./Projects.css";
 
 type Project = {
 	title: string,
@@ -106,10 +107,7 @@ const Projects: FC<{reduceRef: ReduceBoxRef}> = (props) =>{
 		}
 	},[mainDiv, windowInfo]);
 
-	return (<Box ref={mainDiv} sx={{
-			backgroundColor: "red",
-			marginBottom: "50px",
-		}}>
+	return (<div ref={mainDiv} id="projects_left">
 		<Typography variant="h2" sx={{
 			fontFamily: '"Press Start 2P"'
 		}}>
@@ -119,7 +117,7 @@ const Projects: FC<{reduceRef: ReduceBoxRef}> = (props) =>{
 			PROJECTS.map(p=> <CreateProject proj={p} />)
 		}
 		<br/>
-		</Box>)
+		</div>)
 }
 
 export default Projects;

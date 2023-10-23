@@ -5,6 +5,7 @@ import { useAppSelector } from "../redux/hooks";
 import gsap from "gsap";
 import TextPlugin from "gsap/TextPlugin";
 import { ReduceBoxRef } from "./Left";
+import "./About.css";
 
 gsap.registerPlugin(TextPlugin);
 
@@ -51,9 +52,7 @@ const About: FC<{reduceRef: ReduceBoxRef}> = (props)=> {
 		});
 	},[textAbout, textShow])
 
-	return (<Box component="div" ref={mainDiv} sx={{
-		backgroundColor: "black",
-	}}>
+	return (<div id="about_left" ref={mainDiv}>
 		<Typography variant="h2" sx={{
 			color: "white",
 				fontFamily: '"Press Start 2P"'
@@ -67,7 +66,7 @@ const About: FC<{reduceRef: ReduceBoxRef}> = (props)=> {
 				fontFamily: '"Press Start 2P"'
 		}}>
 		</Typography><br/>
-		</Box>);
+		</div>);
 }
 
 export default About;

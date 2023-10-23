@@ -2,6 +2,7 @@ import { FC, useEffect, useRef, useState } from "react";
 import { Box, Typography } from "@mui/material";
 import { useAppSelector } from "../redux/hooks";
 import { ReduceBoxRef } from "./Left";
+import "./Credentials.css";
 
 type Range = {
 	start: string | null,
@@ -57,10 +58,7 @@ const Credentials: FC<{reduceRef: ReduceBoxRef}> = (props) =>{
 		}
 	},[mainDiv, windowInfo]);
 
-	return (<Box ref={mainDiv} sx={{
-			backgroundColor: "white",
-			marginBottom: "150px",
-		}}>
+	return (<div ref={mainDiv} id="credentials_left">
 		<Typography variant="h2" sx={{
 			fontFamily: '"Press Start 2P"'
 		}}>
@@ -71,7 +69,7 @@ const Credentials: FC<{reduceRef: ReduceBoxRef}> = (props) =>{
 				return <CreateCredential cred={credential} />
 			})
 		}
-		</Box>)
+		</div>)
 }
 
 export default Credentials;
