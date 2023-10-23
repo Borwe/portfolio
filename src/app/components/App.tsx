@@ -1,14 +1,17 @@
 'use client'
 
-import { useEffect } from 'react';
+import { FC, useEffect } from 'react';
 import TopBar from './TopBar';
 import Footer from './Footer';
 import Content from './Content';
 import { useAppDispatch} from "./redux/hooks";
 import { screenChanged } from './redux/windowSlice';
+import { PR } from '../page'
+import { setup } from './redux/prsSlice';
 
-function App() {
+const  App: FC<{prs: PR[]}> = (props) => {
 	const dispatch = useAppDispatch();
+	dispatch(setup(props.prs))
 	dispatch(screenChanged());
 	useEffect(() => {
 		const windowSizeChange = () => {
