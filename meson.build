@@ -10,7 +10,10 @@ project(
 build_dir = meson.current_build_dir()
 source_dir = meson.current_source_dir()
 
+bo_arena = dependency('bo_arena')
+
 dependencies = [
+  bo_arena
 ]
 
 sources = [
