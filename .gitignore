@@ -4,3 +4,5 @@ subprojects/*
 !subprojects/*.wrap
 
 muon.core
+compile_commands.json
+.cache/
