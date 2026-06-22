@@ -26,7 +26,6 @@ pub fn build(b: *std.Build) void {
         run_cmd.addArgs(args);
     }
 
-
     const exe_tests = b.addTest(.{
         .root_module = exe.root_module,
     });

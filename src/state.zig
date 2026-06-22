@@ -1,5 +1,7 @@
 const std = @import("std");
+const Io = std.Io;
 const Allocator = std.mem.Allocator;
+const ArrayList = std.array_list.Managed;
 
 
 const MAX_FILE_LEN: comptime_int = switch(@TypeOf(std.c.MAXNAMLEN)){
@@ -9,23 +11,48 @@ const MAX_FILE_LEN: comptime_int = switch(@TypeOf(std.c.MAXNAMLEN)){
 
 const State = @This();
 
-arena: std.heap.ArenaAllocator,
-old_files: std.ArrayList([MAX_FILE_LEN]u8),
+allocator: Allocator,
+io: Io,
+old_files: ArrayList([:0]const u8),
+new_files: ArrayList([:0]const u8),
 
-pub fn init(allocator: Allocator) !State {
+pub fn init(allocator: Allocator, io: Io) !State {
     
-    var arena = std.heap.ArenaAllocator.init(allocator);
-    const old_files = try std.ArrayList([MAX_FILE_LEN]u8).initCapacity(arena.allocator(), 10);
+    const old_files = ArrayList([:0]const u8).init(allocator);
+    const new_files = ArrayList([:0]const u8).init(allocator);
     return State{
-        .arena = arena,
+        .allocator = allocator,
         .old_files = old_files,
+        .new_files = new_files,
+        .io = io,
     };
 }
 
-pub fn readDirs(this: *State) void{
-    _ =this;
+pub fn readDirs(this: *State) !void{
+    var cwd = try std.Io.Dir.cwd().openDir(this.io, ".", .{.iterate = true});
+
+    var walker =  try cwd.walk(this.allocator);
+
+    while(walker.next(this.io) catch null )|entry|{
+        if(entry.kind == .file){
+            try this.new_files.append(entry.path);
+        }
+    }
 }
 
-pub fn deinit(this: *State) void{
-    this.arena.deinit();
+pub fn deinit(self: *State) void{
+    self.old_files.deinit();
+    self.new_files.deinit();
+}
+
+test "Test reading directories" {
+    const t = std.testing;
+    var talloc = t.allocator_instance;
+    var state = try State.init(talloc.allocator(), t.io);
+    defer state.deinit();
+
+    const old_len = state.new_files.items.len;
+    try state.readDirs();
+    const new_len = state.new_files.items.len;
+    try t.expect(new_len>old_len);
 }
