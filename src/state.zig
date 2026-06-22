@@ -32,6 +32,10 @@ pub fn readDirs(this: *State) !void{
     var cwd = try std.Io.Dir.cwd().openDir(this.io, ".", .{.iterate = true});
 
     var walker =  try cwd.walk(this.allocator);
+    defer walker.deinit();
+
+    this.old_files.clearAndFree();
+    try this.old_files.appendSlice(this.new_files.items);
 
     while(walker.next(this.io) catch null )|entry|{
         if(entry.kind == .file){
@@ -48,6 +52,11 @@ pub fn deinit(self: *State) void{
 test "Test reading directories" {
     const t = std.testing;
     var talloc = t.allocator_instance;
+    defer {
+        if(talloc.deinit() == .leak){
+            @panic("Memory leaked");
+        }
+    }
     var state = try State.init(talloc.allocator(), t.io);
     defer state.deinit();
 
