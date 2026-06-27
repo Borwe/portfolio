@@ -4,6 +4,8 @@ const Allocator = std.mem.Allocator;
 const ArrayList = std.array_list.Managed;
 const c = @cImport(@cInclude("string.h"));
 const md = @import("md_parser.zig");
+const fs = @import("files.zig");
+const File = fs.File;
 
 const Errors = error{IndexMD_Missing};
 
@@ -81,7 +83,6 @@ fn getIndexHtml(this: *State) !ArrayList(u8) {
     return index_html_file;
 }
 
-
 fn genIndexHtml(this: *State) !std.ArrayList(u8) {
     var index_html = try this.getIndexHtml();
     defer index_html.deinit();
@@ -130,14 +131,17 @@ fn genIndexHtml(this: *State) !std.ArrayList(u8) {
     return md.transformMd2Html(index_md_buf.written(), this.allocator);
 }
 
-pub fn generateWeb(this: *State) ![][]u8 {
+pub fn generateWeb(this: *State) !ArrayList(File) {
     try this.readDirs();
+    var files = ArrayList(File).init(this.allocator);
 
     var gen_index_html = try this.genIndexHtml();
     defer gen_index_html.deinit(this.allocator);
-    std.debug.print("DATA:\n{s}",.{gen_index_html.items});
-
-    return &[_][]u8{};
+    try files.append(.{
+        .path = "index.html",
+        .data = gen_index_html.items,
+    });
+    return files;
 }
 
 pub fn deinit(self: *State) void {
@@ -168,7 +172,8 @@ test "Test generating html from markdown" {
     );
     defer state.deinit();
     const web = try state.generateWeb();
-    try t.expectEqual(1, web.len);
+    defer web.deinit();
+    try t.expectEqual(1, web.items.len);
 }
 
 test "Test reading directories" {
