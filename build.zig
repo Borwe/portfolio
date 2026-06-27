@@ -1,16 +1,39 @@
 const std = @import("std");
 
+const IsTest = enum {
+    Yes,
+    No
+};
+
+fn mainModule(b: *std.Build, target: std.Build.ResolvedTarget, isTest: IsTest)*std.Build.Module{
+
+    const optimize = switch (isTest) {
+        .No => b.standardOptimizeOption(.{}),
+        .Yes => .safe
+    };
+
+
+    const xml2 = b.dependency("libxml2",.{
+        .target = target,
+        .optimize = optimize
+    });
+
+    var module = b.createModule(.{
+        .root_source_file = b.path("src/main.zig"),
+        .target = target,
+        .optimize = optimize,
+        .link_libc = true,
+    });
+    module.linkLibrary(xml2.artifact("xml"));
+    return module;
+}
+
 pub fn build(b: *std.Build) void {
     const target = b.standardTargetOptions(.{});
-    const optimize = b.standardOptimizeOption(.{});
 
     const exe = b.addExecutable(.{
         .name = "portfolio",
-        .root_module = b.createModule(.{
-            .root_source_file = b.path("src/main.zig"),
-            .target = target,
-            .optimize = optimize,
-        }),
+        .root_module = mainModule(b, target, .No),
     });
 
     b.installArtifact(exe);
@@ -22,12 +45,11 @@ pub fn build(b: *std.Build) void {
 
     run_cmd.step.dependOn(b.getInstallStep());
 
-    if (b.args) |args| {
-        run_cmd.addArgs(args);
-    }
+
+    run_cmd.addPassthruArgs();
 
     const exe_tests = b.addTest(.{
-        .root_module = exe.root_module,
+        .root_module = mainModule(b, target, .Yes),
     });
 
     const run_exe_tests = b.addRunArtifact(exe_tests);
