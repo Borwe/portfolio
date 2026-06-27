@@ -82,7 +82,7 @@ fn getIndexHtml(this: *State) !ArrayList(u8) {
 }
 
 
-fn genIndexHtml(this: *State) !ArrayList(u8) {
+fn genIndexHtml(this: *State) !std.ArrayList(u8) {
     var index_html = try this.getIndexHtml();
     defer index_html.deinit();
 
@@ -134,7 +134,8 @@ pub fn generateWeb(this: *State) ![][]u8 {
     try this.readDirs();
 
     var gen_index_html = try this.genIndexHtml();
-    defer gen_index_html.deinit();
+    defer gen_index_html.deinit(this.allocator);
+    std.debug.print("DATA:\n{s}",.{gen_index_html.items});
 
     return &[_][]u8{};
 }
