@@ -7,7 +7,8 @@ project(
   version: '0.0.1'
   )
 
-libuv = dependency('libuv')
+libuv = dependency('libuv',
+  default_options: {'build_tests':false})
 bo_arena = dependency('bo_arena')
 msn = subproject('bo_meson')
 compile_cmds = msn.get_variable('compile_cmds')

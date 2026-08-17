@@ -1,4 +1,4 @@
 [wrap-git]
 url = https://github.com/Borwe/bo_meson.git
 depth = 1
-revision = HEAD
+revision = v0.1.0

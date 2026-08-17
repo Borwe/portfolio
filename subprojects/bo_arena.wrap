@@ -2,3 +2,6 @@
 url = https://github.com/Borwe/bo_arena.git
 revision = HEAD
 depth = 1
+
+[provide]
+bo_arena=bo_arena_dep
