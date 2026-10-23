@@ -1,11 +1,9 @@
 use std::{
-    alloc::{Layout, alloc},
     env::current_dir,
     fs::{self, DirEntry, File},
     io,
     path::PathBuf,
     time::SystemTime,
-    usize,
 };
 
 use axum::{Router, response::Html, routing::get};
@@ -144,9 +142,9 @@ fn get_mut_ref<'a, T>(ptr: *mut T) -> &'a mut T {
 
 #[tokio::main]
 async fn main() {
-    let state = unsafe { alloc(Layout::new::<State>()) as *mut State };
+    let mut state = State::default();
     spawn({
-        let state = get_mut_ref(state);
+        let state = get_mut_ref(&mut state as *mut State);
         interval_pinging_changes(state)
     });
 
@@ -156,3 +154,6 @@ async fn main() {
         .unwrap();
     axum::serve(listener, router).await.unwrap();
 }
+
+#[cfg(test)]
+mod test {}
