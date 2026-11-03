@@ -156,4 +156,61 @@ async fn main() {
 }
 
 #[cfg(test)]
-mod test {}
+mod test {
+    use std::path::PathBuf;
+
+    use proptest::{collection, prelude::*, string, test_runner::TestRunner};
+
+    #[derive(Debug)]
+    enum FileAction {
+        IsCreateDir,
+        IsCreateFile,
+        IsDelete,
+        IsEditFile,
+        End,
+    }
+
+    #[derive(Debug)]
+    struct FileActionsInput {
+        file_action: FileAction,
+        path: String,
+    }
+
+    impl FileActionsInput {
+        fn new((action, path): (u8, String)) -> Self {
+            Self {
+                file_action: match action {
+                    x if x == FileAction::IsCreateDir as u8 => FileAction::IsCreateDir,
+                    x if x == FileAction::IsCreateFile as u8 => FileAction::IsCreateFile,
+                    x if x == FileAction::IsDelete as u8 => FileAction::IsDelete,
+                    x if x == FileAction::IsEditFile as u8 => FileAction::IsEditFile,
+                    _ => unreachable!(),
+                },
+                path,
+            }
+        }
+    }
+
+    fn test_file_parsing_correctness(inputs: Vec<FileActionsInput>) -> Result<(), TestCaseError> {
+        for input in inputs.iter() {
+            let d = temp_dir::TempDir::new().unwrap();
+            let mut path = d.path();
+        }
+        Ok(())
+    }
+
+    #[test]
+    fn file_traversal_prop_test() {
+        let mut runner = TestRunner::default();
+        runner
+            .run(
+                &collection::vec(
+                    &((0..FileAction::End as u8), "[a-zA-Z0-9]{3,5}")
+                        .prop_map(FileActionsInput::new),
+                    5..10000,
+                ),
+                test_file_parsing_correctness,
+            )
+            .unwrap();
+    }
+}
