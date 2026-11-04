@@ -157,9 +157,11 @@ async fn main() {
 
 #[cfg(test)]
 mod test {
-    use std::path::PathBuf;
+    use std::{cell::UnsafeCell, env, io::Write, time::Duration};
 
-    use proptest::{collection, prelude::*, string, test_runner::TestRunner};
+    use super::*;
+    use proptest::{collection, prelude::*, test_runner::TestRunner};
+    use tokio::time::{Instant, sleep_until};
 
     #[derive(Debug)]
     enum FileAction {
@@ -192,22 +194,97 @@ mod test {
     }
 
     fn test_file_parsing_correctness(inputs: Vec<FileActionsInput>) -> Result<(), TestCaseError> {
-        for input in inputs.iter() {
+        spawn(async move {
             let d = temp_dir::TempDir::new().unwrap();
-            let mut path = d.path();
-        }
+            let path = d.path();
+            env::set_current_dir(path).unwrap();
+            let mut paths: Vec<String> = vec![];
+            let mut paths_dates: Vec<SystemTime> = vec![];
+            let mut state = UnsafeCell::new(State::default());
+
+            let handle = spawn(unsafe {
+                let state = state.get().as_mut().unwrap();
+                async move { interval_pinging_changes(state) }
+            });
+
+            let mut cwd = path.to_path_buf();
+            for input in inputs.iter() {
+                match input.file_action {
+                    FileAction::IsCreateDir => {
+                        let new_dir = path.join(input.path.clone());
+                        cwd = new_dir;
+                    }
+                    FileAction::IsCreateFile => {
+                        let file_path = cwd.join(input.path.clone());
+                        if std::fs::exists(file_path.clone()).unwrap() {
+                            continue;
+                        }
+                        let mut file = File::open(file_path.clone()).unwrap();
+                        let file_path_str = file_path.as_os_str().to_str().unwrap();
+                        file.write(file_path_str.as_bytes()).unwrap();
+                        paths.push(file_path_str.to_string());
+
+                        paths_dates.push(file.metadata().unwrap().modified().unwrap());
+                    }
+                    FileAction::IsDelete => {
+                        if let Some(file_path) = paths.pop() {
+                            paths_dates.pop();
+                            fs::remove_file(file_path).unwrap();
+                        }
+                    }
+                    FileAction::IsEditFile => {
+                        if let Some(file_path) = paths.pop() {
+                            paths_dates.pop();
+                            let mut file = File::open(file_path.clone()).unwrap();
+                            file.write(format!("\n{}", file_path).as_bytes()).unwrap();
+                            paths.push(file_path);
+                            paths_dates.push(file.metadata().unwrap().modified().unwrap());
+                        }
+                    }
+                    FileAction::End => unreachable!("Should never evaluate"),
+                }
+            }
+
+            sleep_until(Instant::now() + Duration::from_secs(1)).await;
+            handle.abort();
+
+            assert_eq!(
+                paths.len(),
+                state.get_mut().files.len(),
+                "state should have same number of files"
+            );
+            assert_eq!(
+                paths_dates.len(),
+                state.get_mut().files_dates.len(),
+                "state should have same number of dates"
+            );
+            assert_eq!(
+                paths.len(),
+                paths_dates.len(),
+                "path should have same count as paths_date"
+            );
+
+            for i in 0..paths.len() {
+                assert_eq!(paths.get(i).unwrap(), state.get_mut().files.get(i).unwrap());
+                assert_eq!(
+                    paths_dates.get(i).unwrap(),
+                    state.get_mut().files_dates.get(i).unwrap()
+                );
+            }
+        });
+
         Ok(())
     }
 
-    #[test]
-    fn file_traversal_prop_test() {
+    #[tokio::test]
+    async fn file_traversal_prop_test() {
         let mut runner = TestRunner::default();
         runner
             .run(
                 &collection::vec(
                     &((0..FileAction::End as u8), "[a-zA-Z0-9]{3,5}")
                         .prop_map(FileActionsInput::new),
-                    5..10000,
+                    100..10000,
                 ),
                 test_file_parsing_correctness,
             )
