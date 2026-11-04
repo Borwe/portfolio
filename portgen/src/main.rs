@@ -248,6 +248,8 @@ mod test {
             sleep_until(Instant::now() + Duration::from_secs(1)).await;
             handle.abort();
 
+            assert!(paths.len() > 0);
+
             assert_eq!(
                 paths.len(),
                 state.get_mut().files.len(),
