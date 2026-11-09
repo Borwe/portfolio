@@ -1,5 +1,6 @@
 use std::{
     env::current_dir,
+    fmt::Display,
     fs::{self, DirEntry, File},
     io,
     path::PathBuf,
@@ -8,6 +9,58 @@ use std::{
 
 use axum::{Router, response::Html, routing::get};
 use tokio::spawn;
+
+struct CodeSection {
+    code_type: String,
+    code: String,
+}
+
+struct ImageSection {
+    alt: String,
+    location: String,
+}
+
+struct LinkSection {
+    alt: String,
+    location: String,
+}
+
+enum AST {
+    Header1(String),
+    Header2(String),
+    Header3(String),
+    Header4(String),
+    Text(String),
+    List(Vec<AST>),
+    CodeBlock(CodeSection),
+    Image(ImageSection),
+    Link(LinkSection),
+}
+
+impl Display for AST {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            AST::Header1(s) => write!(f, "# {s}\n").unwrap(),
+            AST::Header2(s) => write!(f, "## {s}\n").unwrap(),
+            AST::Header3(s) => write!(f, "### {s}\n").unwrap(),
+            AST::Header4(s) => write!(f, "#### {s}\n").unwrap(),
+            AST::Text(s) => write!(f, "{s}\n").unwrap(),
+            AST::List(asts) => {
+                asts.iter().for_each(|ast| ast.fmt(f).unwrap());
+            }
+            AST::CodeBlock(code_section) => {
+                write!(f, "```{}\n{}```", code_section.code_type, code_section.code).unwrap()
+            }
+            AST::Image(image_section) => {
+                write!(f, "![{}]({})", image_section.alt, image_section.location).unwrap()
+            }
+            AST::Link(link_section) => {
+                write!(f, "[{}]({})", link_section.alt, link_section.location).unwrap()
+            }
+        }
+        Ok(())
+    }
+}
 
 async fn index() -> Html<&'static str> {
     Html("<h3>YOLO</h3>")
