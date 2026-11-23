@@ -18,12 +18,23 @@ fn mainModule(b: *std.Build, target: std.Build.ResolvedTarget, isTest: IsTest)*s
         .optimize = optimize
     });
 
+
+    const minish = b.dependency("minish", .{
+        .target = target,
+        .optimize = optimize
+    });
+
+
     var module = b.createModule(.{
         .root_source_file = b.path("src/main.zig"),
         .target = target,
         .optimize = optimize,
         .link_libc = true,
     });
+
+    if(isTest == .Yes){
+        module.addImport("minish", minish.module("minish"));
+    }
     module.linkLibrary(xml2.artifact("xml"));
     return module;
 }

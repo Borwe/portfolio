@@ -23,6 +23,7 @@ const DEFAULT_INDEX_HTML =
 ;
 
 const State = @This();
+const Self = State;
 
 allocator: Allocator,
 cwd: Io.Dir,
@@ -69,7 +70,7 @@ fn getIndexHtml(this: *State) !ArrayList(u8) {
 
     var index_html_file = ArrayList(u8).init(this.allocator);
     for (this.new_files.items) |file| {
-        if (c.strncmp(@ptrCast(file.ptr), @ptrCast(index_html.ptr), index_html.len) == 0) {
+        if(std.mem.count(u8, file, index_html) > 0){
             indexFile = file;
         }
     }
@@ -176,27 +177,71 @@ test "Test generating html from markdown" {
     try t.expectEqual(1, web.items.len);
 }
 
+fn genMinishTest(T: type) type {
+    return struct {
+        const minish = @import("minish");
+        const gen = minish.gen;
+        const TestFn = @This();
+        const FuncParam = struct {T, std.mem.Allocator};
+        const FuncType = *const fn(input: FuncParam) NullErr!void;
+
+        generator: gen.Generator(FuncParam),
+        func: FuncType, 
+        options: minish.Options,
+
+        const NullErr = error {
+            Null
+        };
+
+        fn call(self: *const TestFn, alloc: std.mem.Allocator) !void{
+            try minish.check(alloc,self.generator,self.func,self.options);
+        }
+
+        fn init(comptime generator: gen.Generator(T), func: FuncType, options: minish.Options) TestFn {
+            return .{
+                .generator = gen.tuple2(T, std.mem.Allocator, generator, gen.constant(std.testing.allocator)),
+                .func = func,
+                .options = options,
+            };
+        }
+    };
+}
+
 test "Test reading directories" {
+    const minish = @import("minish");
+    const GenBool = genMinishTest(bool);
     const t = std.testing;
     var talloc = t.allocator_instance;
     defer {
         if (talloc.deinit() != 0) {
             @panic("Memory leaked");
         }
+        std.debug.print("DONE", .{});
     }
-    var state = try State.init(
-        talloc.allocator(),
-        t.io,
-        try Io.Dir.cwd().openDir(
-            t.io,
-            ".",
-            .{ .iterate = true },
-        ),
-    );
-    defer state.deinit();
+    const testrun = GenBool.init(minish.gen.boolean(),struct{
+            fn call(val: struct {bool, std.mem.Allocator}) GenBool.NullErr!void {
+                var dir = t.tmpDir(.{
+                    .iterate = true,
+                    .access_sub_paths = true
+                });
+                defer dir.cleanup();
+                var state = try State.init(
+                    val[1],
+                    t.io,
+                    dir.dir,
+                );
+                defer state.deinit();
 
-    const old_len = state.new_files.items.len;
-    try state.readDirs();
-    const new_len = state.new_files.items.len;
-    try t.expect(new_len > old_len);
+
+                const old_len = state.new_files.items.len;
+                state.readDirs() catch unreachable;
+                const new_len = state.new_files.items.len;
+                std.debug.print("val: {} > {}\n",.{new_len, old_len});
+                t.expect(new_len > old_len) catch unreachable;
+                std.debug.print("Done baby!",.{});
+            }
+        }.call, .{
+                .num_runs = 1,
+    });
+    try testrun.call(talloc.allocator());
 }
