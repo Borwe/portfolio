@@ -1,3 +1,0 @@
-[workspace]
-members = ["portgen", "xtask"]
-resolver = "3"
