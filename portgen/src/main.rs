@@ -10,28 +10,33 @@ use std::{
 use axum::{Router, response::Html, routing::get};
 use tokio::spawn;
 
+#[derive(Debug)]
 struct CodeSection {
-    code_type: String,
-    code: String,
+    code_type: Option<&'static str>,
+    code: &'static str,
 }
 
+#[derive(Debug)]
 struct ImageSection {
-    alt: String,
-    location: String,
+    alt: &'static str,
+    location: &'static str,
 }
 
+#[derive(Debug)]
 struct LinkSection {
-    alt: String,
-    location: String,
+    alt: &'static str,
+    location: &'static str,
 }
 
+#[derive(Debug)]
 enum AST {
-    Header1(String),
-    Header2(String),
-    Header3(String),
-    Header4(String),
-    Text(String),
-    List(Vec<AST>),
+    Header1(&'static str),
+    Header2(&'static str),
+    Header3(&'static str),
+    Header4(&'static str),
+    Text(&'static str),
+    List(u32, Vec<AST>),
+    Code(&'static str),
     CodeBlock(CodeSection),
     Image(ImageSection),
     Link(LinkSection),
@@ -48,15 +53,20 @@ impl Display for AST {
             AST::List(asts) => {
                 asts.iter().for_each(|ast| ast.fmt(f).unwrap());
             }
-            AST::CodeBlock(code_section) => {
-                write!(f, "```{}\n{}```", code_section.code_type, code_section.code).unwrap()
-            }
+            AST::CodeBlock(code_section) => write!(
+                f,
+                "```{}\n{}```",
+                code_section.code_type.unwrap_or(""),
+                code_section.code
+            )
+            .unwrap(),
             AST::Image(image_section) => {
                 write!(f, "![{}]({})", image_section.alt, image_section.location).unwrap()
             }
             AST::Link(link_section) => {
                 write!(f, "[{}]({})", link_section.alt, link_section.location).unwrap()
             }
+            AST::Code(s) => write!(f, "`{}`", s).unwrap(),
         }
         Ok(())
     }
@@ -213,7 +223,7 @@ mod test {
     use std::{cell::UnsafeCell, env, io::Write, time::Duration};
 
     use super::*;
-    use proptest::{collection, prelude::*, test_runner::TestRunner};
+    use proptest::{collection, prelude::*, strategy::TupleUnion, test_runner::TestRunner};
     use tokio::time::{Instant, sleep_until};
 
     #[derive(Debug)]
@@ -345,4 +355,29 @@ mod test {
             )
             .unwrap();
     }
+
+    fn mark_down_gen() -> impl Strategy<Value = AST> {
+        let md_ast = prop_oneof![
+            ".*".prop_map(|s| AST::Header1(s.leak())),
+            ".*".prop_map(|s| AST::Header2(s.leak())),
+            ".*".prop_map(|s| AST::Header3(s.leak())),
+            ".*".prop_map(|s| AST::Header4(s.leak())),
+            ".*".prop_map(|s| AST::Text(s.leak())),
+            ".*".prop_map(|s| AST::Code(s.leak())),
+            (".*", ".*", any::<bool>()).prop_map(|(s1, s2, set)| AST::CodeBlock(CodeSection {
+                code_type: if set { Some(s1.leak()) } else { None },
+                code: s2.leak()
+            })),
+            (".*", ".*").prop_map(|(s1, s2)| AST::CodeBlock(CodeSection {
+                code_type: Some(s1.leak()),
+                code: s2.leak()
+            })),
+        ];
+
+        //recursive for the List
+        md_ast.prop_recursive()
+    }
+
+    #[test]
+    fn test_markdown_parsing() {}
 }
